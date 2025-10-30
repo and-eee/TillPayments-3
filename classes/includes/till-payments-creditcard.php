@@ -243,37 +243,37 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
         );
 
         /**
-         * gateway customer
+         * gateway customer (with field size sanitization)
          */
         $customer = new TillPayments\Client\Data\Customer();
         $customer
-            ->setBillingAddress1($this->order->get_billing_address_1())
-            ->setBillingAddress2($this->order->get_billing_address_2())
-            ->setBillingCity($this->order->get_billing_city())
-            ->setBillingCountry($this->order->get_billing_country())
-            ->setBillingPhone($this->order->get_billing_phone())
-            ->setBillingPostcode($this->order->get_billing_postcode())
-            ->setBillingState($this->order->get_billing_state())
-            ->setCompany($this->order->get_billing_company())
-            ->setEmail($this->order->get_billing_email())
-            ->setFirstName($this->order->get_billing_first_name())
+            ->setBillingAddress1($this->sanitizeField('billingAddress1', $this->order->get_billing_address_1()))
+            ->setBillingAddress2($this->sanitizeField('billingAddress2', $this->order->get_billing_address_2()))
+            ->setBillingCity($this->sanitizeField('billingCity', $this->order->get_billing_city()))
+            ->setBillingCountry($this->sanitizeField('billingCountry', $this->order->get_billing_country()))
+            ->setBillingPhone($this->sanitizeField('billingPhone', $this->order->get_billing_phone()))
+            ->setBillingPostcode($this->sanitizeField('billingPostcode', $this->order->get_billing_postcode()))
+            ->setBillingState($this->sanitizeField('billingState', $this->order->get_billing_state()))
+            ->setCompany($this->sanitizeField('company', $this->order->get_billing_company()))
+            ->setEmail($this->sanitizeField('email', $this->order->get_billing_email()))
+            ->setFirstName($this->sanitizeField('firstName', $this->order->get_billing_first_name()))
             ->setIpAddress(WC_Geolocation::get_ip_address()) // $this->order->get_customer_ip_address()
-            ->setLastName($this->order->get_billing_last_name());
+            ->setLastName($this->sanitizeField('lastName', $this->order->get_billing_last_name()));
 
         /**
-         * add shipping data for non-digital goods
+         * add shipping data for non-digital goods (with field size sanitization)
          */
         if ($this->order->get_shipping_country()) {
             $customer
-                ->setShippingAddress1($this->order->get_shipping_address_1())
-                ->setShippingAddress2($this->order->get_shipping_address_2())
-                ->setShippingCity($this->order->get_shipping_city())
-                ->setShippingCompany($this->order->get_shipping_company())
-                ->setShippingCountry($this->order->get_shipping_country())
-                ->setShippingFirstName($this->order->get_shipping_first_name())
-                ->setShippingLastName($this->order->get_shipping_last_name())
-                ->setShippingPostcode($this->order->get_shipping_postcode())
-                ->setShippingState($this->order->get_shipping_state());
+                ->setShippingAddress1($this->sanitizeField('shippingAddress1', $this->order->get_shipping_address_1()))
+                ->setShippingAddress2($this->sanitizeField('shippingAddress2', $this->order->get_shipping_address_2()))
+                ->setShippingCity($this->sanitizeField('shippingCity', $this->order->get_shipping_city()))
+                ->setShippingCompany($this->sanitizeField('shippingCompany', $this->order->get_shipping_company()))
+                ->setShippingCountry($this->sanitizeField('shippingCountry', $this->order->get_shipping_country()))
+                ->setShippingFirstName($this->sanitizeField('shippingFirstName', $this->order->get_shipping_first_name()))
+                ->setShippingLastName($this->sanitizeField('shippingLastName', $this->order->get_shipping_last_name()))
+                ->setShippingPostcode($this->sanitizeField('shippingPostcode', $this->order->get_shipping_postcode()))
+                ->setShippingState($this->sanitizeField('shippingState', $this->order->get_shipping_state()));
         }
 
         /**
