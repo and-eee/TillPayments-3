@@ -113,6 +113,78 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
         return $available_gateways;
     }
 
+    /**
+     * Field size limits for Till Payments gateway (standard payment gateway constraints)
+     * These are applied to prevent gateway validation errors
+     *
+     * @var array
+     */
+    private $fieldSizeLimits = [
+        'firstName' => 50,
+        'lastName' => 50,
+        'company' => 100,
+        'email' => 255,
+        'billingAddress1' => 100,
+        'billingAddress2' => 100,
+        'billingCity' => 50,
+        'billingState' => 50,
+        'billingCountry' => 2,
+        'billingPostcode' => 20,
+        'billingPhone' => 20,
+        'shippingFirstName' => 50,
+        'shippingLastName' => 50,
+        'shippingCompany' => 100,
+        'shippingAddress1' => 100,
+        'shippingAddress2' => 100,
+        'shippingCity' => 50,
+        'shippingState' => 50,
+        'shippingCountry' => 2,
+        'shippingPostcode' => 20,
+        'shippingPhone' => 20,
+    ];
+
+    /**
+     * Sanitize and truncate customer data fields to meet gateway constraints
+     * Logs warnings when fields are truncated
+     *
+     * @param string $fieldName Field identifier (e.g., 'firstName', 'billingAddress1')
+     * @param string $value Field value from order
+     * @return string Truncated field value or original if within limits
+     */
+    private function sanitizeField($fieldName, $value)
+    {
+        if (empty($value)) {
+            return $value;
+        }
+
+        $value = trim($value);
+        if (!isset($this->fieldSizeLimits[$fieldName])) {
+            return $value;
+        }
+
+        $maxLength = $this->fieldSizeLimits[$fieldName];
+        $currentLength = strlen($value);
+
+        if ($currentLength > $maxLength) {
+            $truncatedValue = substr($value, 0, $maxLength);
+            $this->log(
+                sprintf(
+                    'Field "%s" truncated from %d to %d characters: "%s" → "%s"',
+                    $fieldName,
+                    $currentLength,
+                    $maxLength,
+                    $value,
+                    $truncatedValue
+                ),
+                WC_Log_Levels::WARNING,
+                'FieldTruncation'
+            );
+            return $truncatedValue;
+        }
+
+        return $value;
+    }
+
     private function encodeOrderId($orderId)
     {
         return $orderId . '-' . date('YmdHis') . substr(sha1(uniqid()), 0, 10);
