@@ -1740,16 +1740,23 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             }
             </style>
 
-            <!-- Card Nickname Modal -->
+            <!-- Card Details Modal -->
             <div id="till-payments-nickname-modal" class="till-payments-modal">
                 <div class="till-payments-modal-content">
-                    <h3>Save Card</h3>
-                    <p id="card-info-display" style="font-weight: bold; margin-bottom: 20px;">Card details will appear here</p>
-                    <label for="card-nickname" style="display: block; margin-bottom: 8px; font-weight: bold;">Give this card a name (optional)</label>
-                    <input type="text" id="card-nickname" placeholder="e.g., My Visa, Business Card" maxlength="50">
+                    <h3>Save Card for Future Use</h3>
+
+                    <label for="card-last-4" style="display: block; margin-bottom: 8px; font-weight: bold;">Last 4 Digits *</label>
+                    <input type="text" id="card-last-4" placeholder="e.g., 1234" maxlength="4" inputmode="numeric" style="margin-bottom: 15px;">
+
+                    <label for="card-expiry-modal" style="display: block; margin-bottom: 8px; font-weight: bold;">Expiry Date (MM/YY) *</label>
+                    <input type="text" id="card-expiry-modal" placeholder="e.g., 12/25" maxlength="5" inputmode="numeric" style="margin-bottom: 15px;">
+
+                    <label for="card-nickname" style="display: block; margin-bottom: 8px; font-weight: bold;">Card Name (optional)</label>
+                    <input type="text" id="card-nickname" placeholder="e.g., My Visa, Business Card" maxlength="50" style="margin-bottom: 15px;">
+
                     <div class="till-payments-modal-buttons">
-                        <button type="button" class="btn-cancel" onclick="document.getElementById(\'till-payments-nickname-modal\').style.display=\'none\'; document.getElementById(\'till_payments_save_card\').checked=false;">Cancel</button>
-                        <button type="button" class="btn-save" onclick="till_payments_save_nickname();">Save Card</button>
+                        <button type="button" class="btn-cancel" onclick="till_payments_cancel_save();">Cancel</button>
+                        <button type="button" class="btn-save" onclick="till_payments_save_card_details();">Save Card</button>
                     </div>
                 </div>
             </div>
@@ -1760,38 +1767,83 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 if (saveCardCheckbox) {
                     saveCardCheckbox.addEventListener(\'change\', function() {
                         if (this.checked) {
+                            // Clear previous values
+                            document.getElementById(\'card-last-4\').value = \'\';
+                            document.getElementById(\'card-expiry-modal\').value = \'\';
+                            document.getElementById(\'card-nickname\').value = \'\';
+
                             // Show the modal
                             document.getElementById(\'till-payments-nickname-modal\').style.display = \'block\';
 
-                            // Display card info
-                            var brand = document.getElementById(\'till_payments_card_brand\').value || \'Card\';
-                            var expiry = document.getElementById(\'till_payments_card_expiry\').value || \'••/••\';
-                            document.getElementById(\'card-info-display\').textContent = brand + \' •••• Expires: \' + expiry;
-
-                            // Focus on input
-                            document.getElementById(\'card-nickname\').focus();
+                            // Focus on first input
+                            document.getElementById(\'card-last-4\').focus();
                         } else {
                             document.getElementById(\'till-payments-nickname-modal\').style.display = \'none\';
                         }
                     });
                 }
+
+                // Auto-format expiry in modal too
+                var expiryModal = document.getElementById(\'card-expiry-modal\');
+                if (expiryModal) {
+                    expiryModal.addEventListener(\'input\', function() {
+                        var value = this.value.replace(/\D/g, \'\');
+                        if (value.length >= 2) {
+                            value = value.substring(0, 2) + \'/\' + value.substring(2, 4);
+                        }
+                        this.value = value;
+                    });
+
+                    expiryModal.addEventListener(\'keydown\', function(e) {
+                        if (e.key === \'Backspace\') {
+                            var value = this.value;
+                            if (value.length === 3 && value[2] === \'/\') {
+                                this.value = value.substring(0, 2);
+                                e.preventDefault();
+                            }
+                        }
+                    });
+                }
             })();
 
-            function till_payments_save_nickname() {
+            function till_payments_save_card_details() {
+                var last4 = document.getElementById(\'card-last-4\').value.trim();
+                var expiry = document.getElementById(\'card-expiry-modal\').value.trim();
                 var nickname = document.getElementById(\'card-nickname\').value.trim();
+
+                // Validate required fields
+                if (!last4 || last4.length < 4) {
+                    alert(\'Please enter the last 4 digits of your card\');
+                    document.getElementById(\'card-last-4\').focus();
+                    return;
+                }
+
+                if (!expiry || expiry.length < 5) {
+                    alert(\'Please enter the expiry date in MM/YY format\');
+                    document.getElementById(\'card-expiry-modal\').focus();
+                    return;
+                }
+
+                // Save to hidden fields
+                document.getElementById(\'till_payments_card_last_4\').value = last4;
+                document.getElementById(\'till_payments_card_expiry\').value = expiry;
                 document.getElementById(\'till_payments_card_nickname\').value = nickname;
+
+                // Close modal and keep checkbox checked
                 document.getElementById(\'till-payments-nickname-modal\').style.display = \'none\';
-                // Keep the checkbox checked
                 document.getElementById(\'till_payments_save_card\').checked = true;
             }
 
-            // Allow Enter key to save
+            function till_payments_cancel_save() {
+                document.getElementById(\'till-payments-nickname-modal\').style.display = \'none\';
+                document.getElementById(\'till_payments_save_card\').checked = false;
+            }
+
+            // Allow Enter key to save from any field
             document.addEventListener(\'keypress\', function(e) {
                 if (e.key === \'Enter\' && document.getElementById(\'till-payments-nickname-modal\').style.display === \'block\') {
-                    if (document.activeElement.id === \'card-nickname\') {
-                        till_payments_save_nickname();
-                        e.preventDefault();
-                    }
+                    till_payments_save_card_details();
+                    e.preventDefault();
                 }
             });
             </script>';
