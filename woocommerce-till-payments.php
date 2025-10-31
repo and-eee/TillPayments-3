@@ -44,12 +44,14 @@ add_action('plugins_loaded', function () {
         return $content;
     }, 0, 1);
 
-    add_action( 'init', 'woocommerce_clear_cart_url' );
-    function woocommerce_clear_cart_url() {
-        if (isset( $_GET['clear-cart']) && is_order_received_page()) {
-            global $woocommerce;
+    if (!function_exists('woocommerce_clear_cart_url')) {
+        add_action( 'init', 'woocommerce_clear_cart_url' );
+        function woocommerce_clear_cart_url() {
+            if (isset( $_GET['clear-cart']) && is_order_received_page()) {
+                global $woocommerce;
 
-            $woocommerce->cart->empty_cart();
+                $woocommerce->cart->empty_cart();
+            }
         }
     }
 
