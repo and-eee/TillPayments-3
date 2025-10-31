@@ -307,13 +307,13 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             ->setCallbackUrl($this->callbackUrl)
             ->setCancelUrl(wc_get_checkout_url())
             ->setSuccessUrl($this->paymentSuccessUrl($this->order))
-            ->setErrorUrl(add_query_arg(['gateway_return_result' => 'error'], TILL_PAYMENTS_INTEGRATION_KEY ? $this->order->get_checkout_payment_url(false) : wc_get_checkout_url()));
+            ->setErrorUrl(add_query_arg(['gateway_return_result' => 'error'], TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY ? $this->order->get_checkout_payment_url(false) : wc_get_checkout_url()));
         
         /**
          * integration key is set -> seamless
          * proceed to pay now page or apply submitted transaction token
          */
-        if (TILL_PAYMENTS_INTEGRATION_KEY) {
+        if (TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY) {
             $token = !empty($this->get_post_data()['token']) ? $this->get_post_data()['token'] : null;
             if (!$token) {
                 return [
@@ -648,7 +648,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         wp_enqueue_script('payment_js_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
         wp_enqueue_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
 
-        echo '<script>window.integrationKey_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID . '="' . TILL_PAYMENTS_INTEGRATION_KEY . '";</script>
+        echo '<script>window.integrationKey_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID . '="' . TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY . '";</script>
         <style>.payment_box iframe { width: 100%!important } #till_payments_errors{color: red; } 
         #loader {
           position: absolute;  
