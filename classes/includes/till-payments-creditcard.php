@@ -297,7 +297,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
         $orderTxId = $this->encodeOrderId($orderId);
         // keep track of last tx id
-        $this->order->add_meta_data('orderTxId_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $orderTxId, true); 
+        $this->order->add_meta_data('orderTxId_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $orderTxId, true); 
         $this->order->save_meta_data();
         $transaction->setTransactionId($orderTxId)
             ->setAmount(floatval($this->order->get_total()))
@@ -351,7 +351,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 return $this->paymentFailedResponse();
             } elseif ($result->getReturnType() == TillPayments\Client\Transaction\Result::RETURN_TYPE_REDIRECT) {
                 $this->log('  > return type: REDIRECT');
-                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 $this->log('  > redirect URL: '.$result->getRedirectUrl());
@@ -360,7 +360,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                  */
 
                 if ($transactionRequest === 'preauthorize') {
-                    $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'yes', true);
+                    $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
                     $this->order->save_meta_data();
                 }
                 return [
@@ -376,7 +376,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 /**
                  * seamless will finish here ONLY FOR NON-3DS SEAMLESS
                  */
-                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 switch ($transactionRequest) {
@@ -395,7 +395,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             }
 
             if ($transactionRequest === 'preauthorize') {
-                $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'yes', true);
+                $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
                 $this->order->save_meta_data();
             }
 
@@ -447,7 +447,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         $transaction->setTransactionId($refundTxId)
             ->setAmount(floatval($amount))
             ->setCurrency($this->order->get_currency())
-            ->setReferenceTransactionId($this->order->get_meta('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID))
+            ->setReferenceTransactionId($this->order->get_meta('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID))
             ->setCallbackUrl($this->callbackUrl);
 
         /**
@@ -549,7 +549,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         $this->order = new WC_Order($this->decodeOrderId($callbackResult->getTransactionId()));
 
         // check if callback data is coming from the last (=newest+relevant) tx attempt, otherwise ignore it
-        if ($this->order->get_meta('orderTxId_' . TILL_PAYMENTS_EXTENSION_VERSION_ID) !== $callbackResult->getTransactionId()) {
+        if ($this->order->get_meta('orderTxId_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID) !== $callbackResult->getTransactionId()) {
             die("OK");
         }
         
@@ -645,10 +645,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('payment_js_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
-        wp_enqueue_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
+        wp_enqueue_script('payment_js_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
+        wp_enqueue_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
 
-        echo '<script>window.integrationKey_' . TILL_PAYMENTS_EXTENSION_VERSION_ID . '="' . TILL_PAYMENTS_INTEGRATION_KEY . '";</script>
+        echo '<script>window.integrationKey_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID . '="' . TILL_PAYMENTS_INTEGRATION_KEY . '";</script>
         <style>.payment_box iframe { width: 100%!important } #till_payments_errors{color: red; } 
         #loader {
           position: absolute;  
