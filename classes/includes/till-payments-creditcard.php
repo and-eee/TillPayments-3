@@ -656,7 +656,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
          * order & user
          */
         $this->order = new WC_Order($orderId);
-        $this->order->update_status('pending', __('Awaiting payment', 'woocommerce'));
+        $this->order->add_order_note(__('Payment process initiated', 'woocommerce'));
         $this->user = $this->order->get_user();
 
         /**
