@@ -1361,14 +1361,21 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 case \TillPayments\Client\Callback\Result::TYPE_DEBIT:
                 case \TillPayments\Client\Callback\Result::TYPE_CAPTURE:
                 case \TillPayments\Client\Callback\Result::TYPE_VOID:
-                    $this->order->add_order_note(__('Error during payment process', 'woocommerce'));
-                    // Send failed order email notification
-                    WC()->mailer()->get_emails()['WC_Email_Failed_Order']->trigger($this->order->get_id());
+                    // Only mark as failed if not already processed
+                    if ($alreadyProcessed !== 'yes') {
+                        $this->order->add_order_note(__('Error during payment process', 'woocommerce'));
+                        // Send failed order email notification
+                        WC()->mailer()->get_emails()['WC_Email_Failed_Order']->trigger($this->order->get_id());
+                    } else {
+                        // Payment was already processed successfully, don't mark as failed
+                        $this->order->add_order_note('Error callback received but payment already processed successfully', false);
+                    }
                     break;
             }
         }
 
-        // Explicitly save order to ensure all changes persist
+        // Explicitly save order and metadata to ensure all changes persist
+        $this->order->save_meta_data();
         $this->order->save();
 
         die("OK");
