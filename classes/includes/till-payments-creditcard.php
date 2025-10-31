@@ -1727,9 +1727,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         // New card form (only shown if no saved cards or user selects "new card")
         echo '<div id="till_payments_new_card_form">';
         echo '
-        <style>.payment_box iframe { width: 100%!important } #till_payments_errors{color: red; } 
+        <style>.payment_box iframe { width: 100%!important } #till_payments_errors{color: red; }
         #loader {
-          position: absolute;  
+          position: absolute;
           left: 50%;
           top: 50%;
           border: 5px dotted #808080;
@@ -1739,8 +1739,36 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
           height: 40px;
           -webkit-animation: spin 2s linear infinite; /* Safari */
           animation: spin 1s linear infinite;
+          z-index: 1001;
         }
-        
+
+        #till_payments_processing_message {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          margin-top: 50px;
+          color: #333333;
+          font-size: 14px;
+          line-height: 1.5;
+          text-align: center;
+          display: none;
+          z-index: 1002;
+          white-space: nowrap;
+        }
+
+        #till_payments_overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.3);
+          display: none;
+          z-index: 1000;
+          cursor: not-allowed;
+        }
+
         /* Safari */
         @-webkit-keyframes spin {
           0% { -webkit-transform: rotate(0deg); }
@@ -1750,7 +1778,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         .payment_box::before {
 			border: 0px !important;
 		}
-        
+
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
