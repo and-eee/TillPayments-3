@@ -289,6 +289,48 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                             }, 50);
                         });
                     };
+
+                    // Listen for WooCommerce payment method changes
+                    // When user deselects and reselects this payment method, reinitialize
+                    $(document).on('payment_method_selected', function() {
+                        console.log('✓ Payment method change detected');
+
+                        // Check if our payment method is selected
+                        var selectedMethod = $('input[name="payment_method"]:checked').val();
+                        console.log('  - Selected method:', selectedMethod);
+
+                        if (selectedMethod === 'till_payments_v1_10_5_creditcard') {
+                            console.log('✓ Till Payments v1.10.5 Credit Card selected - checking form state');
+
+                            setTimeout(function() {
+                                // Recheck if form elements exist (DOM may have been recreated)
+                                var $newForm = $('#till_payments_seamless');
+                                if ($newForm.length > 0) {
+                                    console.log('✓ Form found after payment method change, reinitializing');
+                                    // Reinitialize - call initializeForm again
+                                    initializeForm();
+                                } else {
+                                    console.warn('✗ Form not found after payment method change');
+                                }
+                            }, 100);
+                        }
+                    });
+
+                    // Also listen for the general checkout_updated event
+                    $(document).on('updated_checkout', function() {
+                        var selectedMethod = $('input[name="payment_method"]:checked').val();
+                        if (selectedMethod === 'till_payments_v1_10_5_creditcard') {
+                            console.log('✓ Checkout updated, Till Payments method is selected');
+
+                            setTimeout(function() {
+                                var $form = $('#till_payments_seamless');
+                                if ($form.length > 0 && !$form.data('till-payments-initialized')) {
+                                    console.log('✓ Form found and not yet reinitialized - reinitializing');
+                                    initializeForm();
+                                }
+                            }, 100);
+                        }
+                    });
                 };
             })();
             </script>
