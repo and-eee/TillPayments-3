@@ -150,11 +150,21 @@ add_action('woocommerce_account_till-payments-saved-cards_endpoint', function ()
     echo '<tbody>';
 
     foreach ($savedCards as $cardId => $card) {
-        $cardDisplay = isset($card['brand']) ? $card['brand'] : 'Card';
-        $cardDisplay .= ' •••• ' . (isset($card['last_4']) ? $card['last_4'] : '****');
+        // Build card display name: nickname (if provided) + brand + last 4
+        $cardDisplay = '';
+
+        // If they gave it a nickname, show that prominently
+        if (!empty($card['nickname'])) {
+            $cardDisplay = esc_html($card['nickname']);
+            $cardDisplay .= ' - ';
+        }
+
+        // Then show brand and last 4
+        $cardDisplay .= isset($card['brand']) ? esc_html($card['brand']) : 'Card';
+        $cardDisplay .= ' •••• ' . (isset($card['last_4']) ? esc_html($card['last_4']) : '****');
 
         echo '<tr>';
-        echo '<td class="woocommerce-table__cell woocommerce-table__cell-order-number">' . esc_html($cardDisplay) . '</td>';
+        echo '<td class="woocommerce-table__cell woocommerce-table__cell-order-number">' . $cardDisplay . '</td>';
         echo '<td class="woocommerce-table__cell">' . esc_html(isset($card['expiry']) ? $card['expiry'] : 'N/A') . '</td>';
         echo '<td class="woocommerce-table__cell">' . esc_html(isset($card['saved_date']) ? date('M j, Y', strtotime($card['saved_date'])) : 'N/A') . '</td>';
         echo '<td class="woocommerce-table__cell">';
