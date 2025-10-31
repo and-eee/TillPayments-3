@@ -1165,7 +1165,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
             if ($transactionRequest === 'preauthorize') {
                 $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
-                $this->order->save_meta_data();
+                if (method_exists($this->order, 'save_meta_data')) {
+                    $this->order->save_meta_data();
+                }
             }
 
             $woocommerce->cart->empty_cart();
