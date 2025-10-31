@@ -365,7 +365,7 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
         $transaction->setTransactionId($refundTxId)
             ->setAmount(floatval($amount))
             ->setCurrency($this->order->get_currency())
-            ->setReferenceTransactionId($this->order->get_meta('paymentUuid'))
+            ->setReferenceTransactionId($this->order->get_meta('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID))
             ->setCallbackUrl($this->callbackUrl);
 
         /**
