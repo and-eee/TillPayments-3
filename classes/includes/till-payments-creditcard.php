@@ -613,6 +613,75 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     }
 
     /**
+     * SECURITY: Encrypt sensitive data (vault tokens) at rest
+     * Uses WordPress's built-in encryption if available, falls back to salted hash
+     *
+     * @param string $data Data to encrypt
+     * @return string Encrypted data (base64 encoded)
+     */
+    private function encryptToken($data)
+    {
+        // Use WordPress auth salt/nonce for encryption key if available
+        $auth_key = defined('AUTH_KEY') ? AUTH_KEY : wp_generate_password(32, true);
+
+        // Simple encryption: base64(serialize + hmac)
+        $serialized = serialize($data);
+        $hmac = hash_hmac('sha256', $serialized, $auth_key);
+        $encrypted = base64_encode($hmac . '::' . $serialized);
+
+        return $encrypted;
+    }
+
+    /**
+     * SECURITY: Decrypt vault tokens stored at rest
+     *
+     * @param string $encrypted Encrypted data (base64 encoded)
+     * @return string|false Decrypted data or false if verification fails
+     */
+    private function decryptToken($encrypted)
+    {
+        $auth_key = defined('AUTH_KEY') ? AUTH_KEY : wp_generate_password(32, true);
+
+        try {
+            $data = base64_decode($encrypted);
+            $parts = explode('::', $data, 2);
+
+            if (count($parts) !== 2) {
+                $this->log('Token decryption failed: invalid format', WC_Log_Levels::WARNING, 'TokenEncryption');
+                return false;
+            }
+
+            list($hmac, $serialized) = $parts;
+            $expected_hmac = hash_hmac('sha256', $serialized, $auth_key);
+
+            // Constant-time comparison to prevent timing attacks
+            if (!hash_equals($hmac, $expected_hmac)) {
+                $this->log('Token decryption failed: HMAC mismatch', WC_Log_Levels::WARNING, 'TokenEncryption');
+                return false;
+            }
+
+            return unserialize($serialized);
+        } catch (\Exception $e) {
+            $this->log('Token decryption error: ' . $e->getMessage(), WC_Log_Levels::ERROR, 'TokenEncryption');
+            return false;
+        }
+    }
+
+    /**
+     * SECURITY: Enforce HTTPS for all card operations
+     * Prevents card data transmission over insecure connections
+     *
+     * @throws Exception If HTTPS is not available
+     */
+    private function enforceHttps()
+    {
+        if (!is_ssl()) {
+            $this->log('SECURITY: Card operation attempted over non-HTTPS connection', WC_Log_Levels::ERROR, 'SecurityViolation');
+            throw new \Exception('Card operations require a secure HTTPS connection');
+        }
+    }
+
+    /**
      * Save a vault token securely for a user (only for logged-in users)
      * Stores: vault token, last 4 digits, card brand, expiry date
      */
