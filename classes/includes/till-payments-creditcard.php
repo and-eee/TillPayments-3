@@ -722,9 +722,11 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
         $orderTxId = $this->encodeOrderId($orderId);
         // keep track of last tx id
-        $this->order->add_meta_data('orderTxId_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $orderTxId, true); 
+        $this->order->add_meta_data('orderTxId_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $orderTxId, true);
         $this->order->save_meta_data();
         $transaction->setTransactionId($orderTxId)
+            ->setMerchantMetaData($this->order->get_id())
+            ->setDescription("Order #{$this->order->get_id()}")
             ->setAmount(floatval($this->order->get_total()))
             ->setCurrency($this->order->get_currency())
             ->setCustomer($customer)
