@@ -497,6 +497,41 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                     });
                                 }
                             }, 50);
+
+                            // SAFETY: Hide loader if WooCommerce checkout validation fails
+                            // This handles cases where required fields are missing, etc.
+                            $(document).on('checkout_error', function() {
+                                console.log('✓ Checkout validation error detected, hiding loader');
+                                $('#till-payments-processing-overlay').removeClass('active');
+                            });
+
+                            // SAFETY: Track loader visibility and auto-hide after 60 seconds
+                            // (in case payment processing is stuck or something goes wrong)
+                            var loaderTimeout = null;
+                            var originalSubmit = $submitBtn.on('click');
+                            $submitBtn.on('click', function() {
+                                // Clear any existing timeout
+                                if (loaderTimeout) {
+                                    clearTimeout(loaderTimeout);
+                                }
+                                // Set a 60-second safety timeout to auto-hide loader
+                                loaderTimeout = setTimeout(function() {
+                                    if ($('#till-payments-processing-overlay').hasClass('active')) {
+                                        console.warn('✗ Loader visible for 60+ seconds, auto-hiding as safety measure');
+                                        $('#till-payments-processing-overlay').removeClass('active');
+                                        wc_add_notice('Payment processing timed out. Please try again.', 'error');
+                                    }
+                                }, 60000);
+                            });
+
+                            // Also hide loader when checkout_place_order_{payment_method} fails
+                            $(document).on('checkout_place_order_fail', function() {
+                                console.log('✓ Checkout place order failed, hiding loader');
+                                if (loaderTimeout) {
+                                    clearTimeout(loaderTimeout);
+                                }
+                                $('#till-payments-processing-overlay').removeClass('active');
+                            });
                         });
                     };
 
