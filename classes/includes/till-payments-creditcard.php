@@ -805,6 +805,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
+                // Add note for redirect (payment processing via hosted page)
+                $this->order->add_order_note('Till Payments: Payment processing redirected to hosted payment page. Reference ID: ' . $result->getReferenceId(), false);
+                $this->order->save();
+
                 $this->log('  > redirect URL: '.$result->getRedirectUrl());
                 /**
                  * hosted payment page or seamless+3DS
@@ -823,6 +827,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                  * payment is pending, wait for callback to complete
                  */
                 $this->log('  > return type: PENDING');
+
+                // Add note for pending (payment awaiting callback)
+                $this->order->add_order_note('Till Payments: Payment processing - awaiting callback confirmation', false);
+                $this->order->save();
             } elseif ($result->getReturnType() == TillPayments\Client\Transaction\Result::RETURN_TYPE_FINISHED) {
                 /**
                  * seamless will finish here ONLY FOR NON-3DS SEAMLESS
