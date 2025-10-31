@@ -702,14 +702,16 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 switch ($transactionRequest) {
                     case 'preauthorize':
                         $this->order->add_order_note('TillPayments authorization ID: '.$result->getReferenceId(), false);
+                        $this->order->update_status('on-hold', 'Payment authorized. Awaiting capture.');
                         break;
                     case 'debit':
                     default:
-                        $this->order->payment_complete();
+                        $this->order->payment_complete($result->getPurchaseId());
                         $this->order->add_order_note('TillPayments purchase ID: '.$result->getPurchaseId(), false);
                         break;
                 }
 
+                $this->order->save();
                 $this->log('  > return type: FINISHED');
                 $this->log('  > result data: '.print_r($result->toArray(), true));
             }
