@@ -926,8 +926,6 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
-
         $applePayFrontendConfig = [
             'button_type' => $this->get_option('button_type'),
             'button_style' => $this->get_option('gateway_style'),
