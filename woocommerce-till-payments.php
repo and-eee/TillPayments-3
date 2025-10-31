@@ -37,13 +37,13 @@ if (!function_exists('woocommerce_clear_cart_url_v1_10_5')) {
 }
 
 add_action('plugins_loaded', function () {
-    require_once TILL_PAYMENTS_EXTENSION_BASEDIR . 'classes/includes/till-payments-provider.php';
-    require_once TILL_PAYMENTS_EXTENSION_BASEDIR . 'classes/includes/till-payments-creditcard.php';
-    require_once TILL_PAYMENTS_EXTENSION_BASEDIR . 'classes/includes/till-payments-googlepay.php';
-    require_once TILL_PAYMENTS_EXTENSION_BASEDIR . 'classes/includes/till-payments-applepay.php';
+    require_once TILL_PAYMENTS_V1_10_5_EXTENSION_BASEDIR . 'classes/includes/till-payments-provider.php';
+    require_once TILL_PAYMENTS_V1_10_5_EXTENSION_BASEDIR . 'classes/includes/till-payments-creditcard.php';
+    require_once TILL_PAYMENTS_V1_10_5_EXTENSION_BASEDIR . 'classes/includes/till-payments-googlepay.php';
+    require_once TILL_PAYMENTS_V1_10_5_EXTENSION_BASEDIR . 'classes/includes/till-payments-applepay.php';
 
     add_filter('woocommerce_payment_gateways', function ($methods) {
-        foreach (WC_TillPayments_Provider::paymentMethods() as $paymentMethod) {
+        foreach (WC_TillPayments_V1_10_5_Provider::paymentMethods() as $paymentMethod) {
             $methods[] = $paymentMethod;
         }
         return $methods;
