@@ -954,37 +954,37 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         }
         </style>
         <div id="till_payments_errors"></div>
-        <div class="payment_box" style="padding: 25px; background-color: #fff; border-radius: 3px; max-width: 450px; min-height: 385px; display: block !important;">
+        <div class="payment_box" style="padding: 25px; background-color: #fff; border-radius: 3px; max-width: 450px; min-height: 385px; display: block !important; width: 100%;">
             <div id = "loader"></div>
-            <div id="till_payments_seamless">
+            <div id="till_payments_seamless" style="display: block !important; visibility: visible !important; width: 100%;">
                 <input type="hidden" id="till_payments_token" name="token">
-                <p class="form-row form-row-wide" style="height: 80px;">
+                <p class="form-row form-row-wide" style="height: 80px; display: block !important;">
                     <label for="till_payments_seamless_card_number">Card Number&nbsp;<abbr class="required" title="required">*</abbr></label>
-                    <span class="woocommerce-input-wrapper">
-                        <span id="till_payments_seamless_card_number" class="input-text" style="padding: 0; width: 100%; border-radius: 3px"></span>
+                    <span class="woocommerce-input-wrapper" style="display: block !important; width: 100%;">
+                        <span id="till_payments_seamless_card_number" class="input-text" style="padding: 0; width: 100% !important; height: 52px !important; border-radius: 3px; display: block !important; visibility: visible !important;"></span>
                     </span>
                 </p>
-                
-                <p class="form-row form-row-wide" style="height: 80px;">
+
+                <p class="form-row form-row-wide" style="height: 80px; display: block !important;">
                     <label for="till_payments_seamless_card_holder">Cardholder Name&nbsp;<abbr class="required" title="required">*</abbr></label>
-                    <span class="woocommerce-input-wrapper">
-                        <input type="text" class="input-text" id="till_payments_seamless_card_holder" style="border-radius: 3px">
+                    <span class="woocommerce-input-wrapper" style="display: block !important; width: 100%;">
+                        <input type="text" class="input-text" id="till_payments_seamless_card_holder" style="border-radius: 3px; width: 100% !important; height: 52px !important; padding: 8px !important; box-sizing: border-box !important;">
                     </span>
                 </p>
-                
-                <p class="form-row form-row-first" style="height: 80px;">
+
+                <p class="form-row form-row-first" style="height: 80px; display: block !important; width: 48%; float: left; margin-right: 2%;">
                     <label for="till_payments_seamless_expiry">Expiration Date&nbsp;<abbr class="required" title="required">*</abbr></label>
-                    <span class="woocommerce-input-wrapper">
-                        <input type="text" class="input-text" id="till_payments_seamless_expiry" maxlength="5" placeholder="MM/YY" style="border-radius: 3px">
+                    <span class="woocommerce-input-wrapper" style="display: block !important;">
+                        <input type="text" class="input-text" id="till_payments_seamless_expiry" maxlength="5" placeholder="MM/YY" style="border-radius: 3px; width: 100% !important; height: 52px !important; padding: 8px !important; box-sizing: border-box !important;">
                     </span>
                 </p>
-                <p class="form-row form-row-last" style="height: 80px;">
-                    <label for="till_payments_seamless_cvv">CVC/CVV Code&nbsp;<abbr class="required" title="required" style="color: #b22222;
-                    text-decoration: none;">*</abbr></label>
-                    <span class="woocommerce-input-wrapper">
-                        <span id="till_payments_seamless_cvv" style="padding: 0; height: 52px; width: 187px; border-radius: 3px"></span>
+                <p class="form-row form-row-last" style="height: 80px; display: block !important; width: 50%; float: left;">
+                    <label for="till_payments_seamless_cvv">CVC/CVV Code&nbsp;<abbr class="required" title="required" style="color: #b22222; text-decoration: none;">*</abbr></label>
+                    <span class="woocommerce-input-wrapper" style="display: block !important;">
+                        <span id="till_payments_seamless_cvv" style="padding: 0; height: 52px !important; width: 100% !important; border-radius: 3px; display: block !important; visibility: visible !important;"></span>
                     </span>
-                </p>   
+                </p>
+                <div style="clear: both;"></div>
             </div>
         </div>';
     }
