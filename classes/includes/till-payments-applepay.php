@@ -73,7 +73,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
         $this->logger = wc_get_logger();
 
         $this->id = TILL_PAYMENTS_V1_10_5_EXTENSION_UID_PREFIX . $this->id;
-        $this->method_description = TILL_PAYMENTS_EXTENSION_NAME . ' ' . $this->method_title . ' payments.';
+        $this->method_description = TILL_PAYMENTS_V1_10_5_EXTENSION_NAME . ' ' . $this->method_title . ' payments.';
         $this->icon = plugins_url('/tillpayments/assets/img/Apple_Pay_Mark_RGB_041619.svg');
         $this->has_fields = true;
 
