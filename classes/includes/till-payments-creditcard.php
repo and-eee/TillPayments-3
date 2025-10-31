@@ -1104,6 +1104,20 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                     $savedCardId = $this->saveCardToken($userId, $vaultToken, $cardDetails);
                     if ($savedCardId) {
                         $this->order->add_order_note('Card saved for future purchases', false);
+
+                        // SECURITY: Audit logging - card saved after successful payment
+                        $this->log(
+                            sprintf(
+                                'AUDIT: New card saved after payment | User: %d | Order: %d | Card ID: %s | Brand: %s | Last 4: %s',
+                                $userId,
+                                $orderId,
+                                $savedCardId,
+                                $cardDetails['brand'],
+                                $cardDetails['last_4']
+                            ),
+                            WC_Log_Levels::INFO,
+                            'CardOperations'
+                        );
                     }
                 }
 
