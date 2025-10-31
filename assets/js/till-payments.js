@@ -1,7 +1,7 @@
 (function ($) {
-	// Initialize immediately OR wait for ready (in case document isn't ready yet)
+	// Initialize function that doesn't depend on document.ready
 	var initTillPayments = function() {
-		console.log('✓ Document ready - Till Payments init starting');
+		console.log('✓ Till Payments initialization starting');
 
 		var $paymentForm = $('#till_payments_seamless').closest('form');
 	    var $paymentFormSubmitButton = $("#place_order");
@@ -24,7 +24,7 @@
 
 	    var initialized = false;
 	    var init = function () {
-	        console.log('→ Outer init() called. integrationKey:', integrationKey ? 'set' : 'UNDEFINED', ', initialized:', initialized);
+	        console.log('→ init() called. integrationKey:', integrationKey ? 'set' : 'UNDEFINED', ', initialized:', initialized);
 	        if (integrationKey && !initialized) {
 	            console.log('✓ Conditions met for initialization');
 	            $paymentFormSubmitButton.prop("disabled", false);
@@ -47,7 +47,7 @@
 	        console.log('→ Form submit button clicked');
 	        tillPaymentsSeamless.submit(
 	            function (token) {
-	                console.log('✓ Token received:', token.substring(0, 10) + '...');
+	                console.log('✓ Token received');
 	                $paymentFormTokenInput.val(token);
 	                $paymentForm.submit();
 	            },
@@ -84,7 +84,7 @@
 	        });
 
 	        var init = async function (integrationKey, invalidCallback, validCallback) {
-	            console.log('→ Inner init() called with integrationKey:', integrationKey ? integrationKey.substring(0, 5) + '...' : 'UNDEFINED');
+	            console.log('→ Inner init() called');
 	            _invalidCallback = invalidCallback;
 	            _validCallback = validCallback;
 
@@ -93,14 +93,12 @@
 	                return;
 	            }
 
-	            console.log('✓ Seamless form found, proceeding with initialization');
+	            console.log('✓ Seamless form found, proceeding');
 	            initialized = true;
 
-	            // Set heights
 	            $seamlessCardNumberInput.height($seamlessCardHolderInput.css('height'));
 	            $seamlessCvvInput.height($seamlessCardHolderInput.css('height'));
 
-	            // Show form
 	            $seamlessForm.show();
 	            console.log('✓ Seamless form shown');
 
@@ -118,25 +116,24 @@
 	                'background': $seamlessCardHolderInput.css('background'),
 	            };
 
-	            console.log('→ Waiting for PaymentJs library to load...');
+	            console.log('→ Waiting for PaymentJs library');
 
 	            const waitForScript = el => {
 	                return new Promise((res, rej) => {
 	                    let retryCounter = 0;
 	                    const findScriptElement = el => {
-	                        // Check if PaymentJs library is loaded
 	                        if (typeof PaymentJs !== 'undefined') {
 	                            console.log('✓ PaymentJs library loaded (attempts:', retryCounter + 1, ')');
 	                            res(new PaymentJs('1.3'));
 	                        }
 	                        else if (retryCounter >= 50) {
-	                            console.error('✗ PaymentJs library failed to load after', retryCounter, 'attempts');
+	                            console.error('✗ PaymentJs library failed to load');
 	                            rej("Payment Js script failed to load");
 	                        }
 	                        else {
 	                            retryCounter += 1;
 	                            if (retryCounter % 10 === 0) {
-	                                console.log('  ... still waiting for PaymentJs (attempt ' + retryCounter + '/50)');
+	                                console.log('  ... still waiting (attempt ' + retryCounter + '/50)');
 	                            }
 	                            setTimeout(() => findScriptElement(el), 100);
 	                        }
@@ -147,38 +144,29 @@
 
 	            try {
 	                await waitForScript(`[data-main="payment-js"]`).then(p => {
-	                    console.log('→ Initializing PaymentJs with integration key');
+	                    console.log('→ Initializing PaymentJs');
 	                    payment = p;
 	                    payment.init(integrationKey, $seamlessCardNumberInput.prop('id'), $seamlessCvvInput.prop('id'), function (payment) {
 	                        console.log('✓ PaymentJs init callback executed');
 
-	                        // Find the payment method container dynamically (works with versioned gateway IDs)
 	                        var paymentMethodElements = document.querySelectorAll('[class*="payment_method_"]');
-	                        console.log('→ Found payment method elements:', paymentMethodElements.length);
 	                        paymentMethodElements.forEach(function(element) {
 	                            if (element.className.includes('till_payments') && element.className.includes('creditcard')) {
-	                                console.log('✓ Setting background transparent for:', element.className);
 	                                element.style.background = 'transparent';
 	                            }
 	                        });
 
-	                        // remove WP injected br tags
 	                        const paymentBoxes = document.querySelectorAll('#payment > ul > li > div > div.payment_box');
-	                        console.log('→ Found payment boxes:', paymentBoxes.length);
 	                        paymentBoxes.forEach(box => {
 	                            const brTags = box.querySelectorAll('br');
-	                            if (brTags.length > 0) {
-	                                console.log('✓ Removing', brTags.length, 'br tags');
-	                            }
 	                            brTags.forEach(br => {
 	                                br.remove();
 	                            });
 	                        });
 
-	                        console.log('→ Setting up payment event handlers');
+	                        console.log('→ Setting up event handlers');
 	                        payment.enableAutofill();
 	                        payment.onAutofill(function(data) {
-	                            console.log('→ Autofill triggered');
 	                            $('#till_payments_seamless_card_holder').val(data.card_holder);
 	                            $('#till_payments_seamless_expiry').val(data.month+"/"+data.year);
 	                        });
@@ -188,25 +176,22 @@
 
 	                        payment.numberOn('input', function (data) {
 	                            validNumber = data.validNumber;
-	                            console.log('→ Card number input event, valid:', data.validNumber);
 	                            validate();
 	                        });
 
 	                        payment.cvvOn('input', function (data) {
 	                            validCvv = data.validCvv;
-	                            console.log('→ CVV input event, valid:', data.validCvv);
 	                            validate();
 	                        });
 
-	                        console.log('✓ PaymentJs fully initialized with all handlers');
+	                        console.log('✓ PaymentJs fully initialized');
 	                    });
 	                });
 	            } catch (e) {
-	                console.error('✗ PaymentJs initialization failed:', e);
+	                console.error('✗ PaymentJs init failed:', e);
 	            }
 
 	            $('input, select', $seamlessForm).on('input', validate);
-	            console.log('✓ Form input event handlers attached');
 	        };
 
 	        var validate = function () {
@@ -225,54 +210,42 @@
 	        };
 
 	        var reset = function () {
-	            console.log('→ Resetting seamless form');
 	            $seamlessForm.hide();
 	        };
 
-	        // add in forward slash to mm/yy
 	        function onExpiryInputChange(e) {
 	            if (e.target.value.length > 2 && !e.target.value.includes("/")) {
 	                document.getElementById("till_payments_seamless_expiry").value = e.target.value.slice(0, 2) + "/" + e.target.value.slice(2)
 	            }
 	        }
 
-	        // Wait for expiry input to exist before attaching handler
 	        var expiryRetries = 0;
 	        var attachExpiryHandler = setInterval(function() {
 	            var expiryInput = document.getElementById("till_payments_seamless_expiry");
 	            if (expiryInput) {
-	                console.log('✓ Attaching expiry input handler');
 	                expiryInput.addEventListener("input", onExpiryInputChange);
 	                clearInterval(attachExpiryHandler);
 	            } else if (expiryRetries > 20) {
-	                console.error('✗ Could not find expiry input element');
 	                clearInterval(attachExpiryHandler);
 	            }
 	            expiryRetries++;
 	        }, 100);
 
-	        // hide loader
 	        function removeLoader() {
 	            var loader = document.getElementById("loader");
 	            if (loader) {
-	                console.log('✓ Removing loader');
 	                loader.style.display = "none";
 	            }
 	        };
 
 	        window.addEventListener('load', function() {
-	            console.log('→ Window load event fired');
-	            // Safely check for iframe before attaching event listener
 	            var iframe = document.querySelector("iframe");
 	            if (iframe) {
-	                console.log('✓ Found iframe, attaching load listener');
 	                iframe.addEventListener("load", removeLoader);
 	            } else {
-	                console.log('→ No iframe found yet, will try again');
 	                setTimeout(function() {
 	                    iframe = document.querySelector("iframe");
 	                    if (iframe) {
-	                        console.log('✓ Found iframe on retry, attaching load listener');
 	                        iframe.addEventListener("load", removeLoader);
 	                    }
 	                }, 500);
@@ -280,7 +253,6 @@
 	        });
 
 	        var submit = function (success, error) {
-	            console.log('→ Submit called');
 	            var expiryData = $seamlessExpiryInput.val().split('/');
 	            payment.tokenize({
 	                    card_holder: $seamlessCardHolderInput.val(),
@@ -289,11 +261,9 @@
 	                    email: $seamlessEmailInput.val()
 	                },
 	                function (token, cardData) {
-	                    console.log('✓ Token generated successfully');
 	                    success.call(this, token);
 	                },
 	                function (errors) {
-	                    console.error('✗ Tokenization errors:', errors);
 	                    error.call(this, errors);
 	                }
 	            );
@@ -306,24 +276,23 @@
 	        };
 	    }();
 
-	    console.log('→ Calling outer init()');
+	    console.log('→ Calling init()');
 	    init();
 
-	    // Also try init after a delay in case integration key wasn't set yet
 	    setTimeout(function() {
-	        console.log('→ Attempting delayed init (in case integration key was late)');
+	        console.log('→ Attempting delayed init');
 	        if (!initialized) {
 	            init();
 	        }
 	    }, 500);
 	};
 
-	// Call immediately if document is ready, otherwise wait for ready
+	// Execute immediately or wait for ready
 	if (document.readyState === 'loading') {
 		console.log('→ Document still loading, waiting for ready');
 		$(document).ready(initTillPayments);
 	} else {
-		console.log('→ Document already ready, initializing immediately');
+		console.log('→ Document already ready, executing immediately');
 		initTillPayments();
 	}
 })(jQuery);
