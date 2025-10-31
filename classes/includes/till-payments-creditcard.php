@@ -735,10 +735,36 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             ->setErrorUrl(add_query_arg(['gateway_return_result' => 'error'], TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY ? $this->order->get_checkout_payment_url(false) : wc_get_checkout_url()));
         
         /**
+         * Check if user selected a saved card (for logged-in users)
+         */
+        $savedCardUsed = false;
+        if (is_user_logged_in()) {
+            $cardSelection = !empty($this->get_post_data()['till_payments_card_selection']) ? $this->get_post_data()['till_payments_card_selection'] : null;
+
+            if ($cardSelection && $cardSelection !== 'new_card') {
+                // User selected a saved card
+                $userId = get_current_user_id();
+                $savedCards = $this->getSavedCards($userId);
+
+                if (isset($savedCards[$cardSelection])) {
+                    $savedCard = $savedCards[$cardSelection];
+                    $vaultToken = $savedCard['token_plain']; // Retrieve the vault token
+
+                    // Use the saved card token
+                    if (TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY) {
+                        $transaction->setTransactionToken($vaultToken);
+                        $savedCardUsed = true;
+                        $this->log('  > Using saved card: ' . $cardSelection);
+                    }
+                }
+            }
+        }
+
+        /**
          * integration key is set -> seamless
          * proceed to pay now page or apply submitted transaction token
          */
-        if (TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY) {
+        if (TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY && !$savedCardUsed) {
             $token = !empty($this->get_post_data()['token']) ? $this->get_post_data()['token'] : null;
             if (!$token) {
                 return [
