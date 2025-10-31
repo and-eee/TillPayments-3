@@ -6,8 +6,8 @@ use TillPayments\Client\Transaction\Debit;
 use TillPayments\Client\Transaction\Preauthorize;
 use TillPayments\Client\Transaction\Refund;
 
-if (!class_exists('WC_TillPayments_ApplePay')) {
-    class WC_TillPayments_ApplePay extends WC_Payment_Gateway
+if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
+    class WC_TillPayments_V1_10_5_ApplePay extends WC_Payment_Gateway
     {
     public const APPLE_PAY_ALLOWED_DOMAINS = [
         'apple-pay-gateway.apple.com',
