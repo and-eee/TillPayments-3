@@ -1102,7 +1102,6 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 // Mark payment as processed to prevent callback from reprocessing
                 $this->order->add_meta_data('payment_processed_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
                 $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
-                $this->order->save_meta_data();
 
                 // Save card if user requested it
                 if (is_user_logged_in() && !empty($_POST['till_payments_save_card'])) {
