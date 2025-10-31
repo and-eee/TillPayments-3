@@ -58,16 +58,154 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
+
+        // Enqueue PaymentJs library
         add_action('wp_enqueue_scripts', function () {
             wp_register_script('payment_js_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $this->get_option('apiHost') . 'js/integrated/payment.1.3.min.js', [], TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION, false);
-            wp_register_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, plugins_url('/tillpayments/assets/js/till-payments.js'), ['jquery'], TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION, false);
-
-            // Enqueue scripts on checkout/pay pages
             if (is_checkout() || is_checkout_pay_page()) {
                 wp_enqueue_script('payment_js_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
-                wp_enqueue_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
             }
         }, 10);
+
+        // Inject initialization directly into footer on checkout pages
+        add_action('wp_footer', function () {
+            if (!(is_checkout() || is_checkout_pay_page())) {
+                return;
+            }
+            ?>
+            <script>
+            (function () {
+                console.log('✓ Till Payments footer initialization starting');
+
+                // Wait for jQuery to be available
+                var checkJQuery = setInterval(function() {
+                    if (typeof jQuery !== 'undefined') {
+                        clearInterval(checkJQuery);
+                        console.log('✓ jQuery available, initializing');
+                        initTillPayments();
+                    }
+                }, 50);
+
+                var initTillPayments = function() {
+                    var $ = jQuery;
+                    console.log('✓ Till Payments init function executing');
+
+                    // Check for integration key
+                    var integrationKey = window.integrationKey_<?php echo TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID; ?>;
+                    console.log('✓ Integration key:', integrationKey ? 'FOUND' : 'MISSING');
+
+                    // Wait for PaymentJs library
+                    var paymentJsRetry = 0;
+                    var waitForPaymentJs = setInterval(function() {
+                        if (typeof PaymentJs !== 'undefined') {
+                            clearInterval(waitForPaymentJs);
+                            console.log('✓ PaymentJs loaded');
+                            initializeForm();
+                        } else if (paymentJsRetry > 100) {
+                            clearInterval(waitForPaymentJs);
+                            console.error('✗ PaymentJs failed to load');
+                        }
+                        paymentJsRetry++;
+                    }, 100);
+
+                    var initializeForm = function() {
+                        var $form = $('#till_payments_seamless');
+                        var $cardNumber = $('#till_payments_seamless_card_number');
+                        var $cvv = $('#till_payments_seamless_cvv');
+                        var $cardHolder = $('#till_payments_seamless_card_holder');
+                        var $expiry = $('#till_payments_seamless_expiry');
+                        var $token = $('#till_payments_token');
+                        var $errors = $('#till_payments_errors');
+                        var $submitBtn = $("#place_order");
+
+                        console.log('✓ Form elements found:', {
+                            form: $form.length,
+                            cardNumber: $cardNumber.length,
+                            cvv: $cvv.length
+                        });
+
+                        if ($form.length === 0) {
+                            console.error('✗ Form not found');
+                            return;
+                        }
+
+                        // Initialize PaymentJs
+                        var payment = new PaymentJs('1.3');
+                        console.log('✓ PaymentJs instance created');
+
+                        var style = {
+                            'border': $cardHolder.css('border'),
+                            'border-radius': $cardHolder.css('border-radius'),
+                            'height': $cardHolder.css('height'),
+                            'padding': $cardHolder.css('padding'),
+                            'font-size': $cardHolder.css('font-size'),
+                            'font-weight': $cardHolder.css('font-weight'),
+                            'font-family': $cardHolder.css('font-family'),
+                            'color': $cardHolder.css('color'),
+                            'background': $cardHolder.css('background'),
+                        };
+
+                        payment.init(integrationKey, $cardNumber.prop('id'), $cvv.prop('id'), function(p) {
+                            console.log('✓ PaymentJs initialized');
+
+                            // Show form
+                            $form.show();
+
+                            // Set styles
+                            payment.setNumberStyle(style);
+                            payment.setCvvStyle(style);
+
+                            // Setup validation
+                            var validNumber = false;
+                            var validCvv = false;
+
+                            payment.numberOn('input', function(data) {
+                                validNumber = data.validNumber;
+                                console.log('Card valid:', validNumber);
+                            });
+
+                            payment.cvvOn('input', function(data) {
+                                validCvv = data.validCvv;
+                                console.log('CVV valid:', validCvv);
+                            });
+
+                            // Handle submit
+                            $submitBtn.on('click', function(e) {
+                                if ($token.val()) {
+                                    return true; // Token already set, proceed
+                                }
+
+                                e.preventDefault();
+                                console.log('Processing payment...');
+
+                                var expiryData = $expiry.val().split('/');
+                                payment.tokenize({
+                                    card_holder: $cardHolder.val(),
+                                    month: expiryData[0],
+                                    year: expiryData[1],
+                                    email: $('#billing_email').val()
+                                },
+                                function(token) {
+                                    console.log('✓ Token received');
+                                    $token.val(token);
+                                    $form.closest('form').submit();
+                                },
+                                function(errors) {
+                                    console.error('Payment errors:', errors);
+                                    $errors.html(errors.map(e => e.message).join('<br>'));
+                                });
+
+                                return false;
+                            });
+
+                            console.log('✓ Form ready for payment');
+                        });
+                    };
+                };
+            })();
+            </script>
+            <?php
+        }, 999);
         add_action('woocommerce_api_wc_' . $this->id, [$this, 'process_callback']);
         add_filter('script_loader_tag', function ($tag, $handle) {
             if ($handle !== 'payment_js_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID) {
