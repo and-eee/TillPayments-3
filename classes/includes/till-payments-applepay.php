@@ -773,10 +773,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
                 'type' => 'select',
                 'label' => 'Environment',
                 'description' => 'Till Environment',
-                'default' => TILL_PAYMENTS_EXTENSION_URL,
+                'default' => TILL_PAYMENTS_V1_10_5_EXTENSION_URL,
                 'options' => [
-                    TILL_PAYMENTS_EXTENSION_URL_TEST => 'Test (Sandbox)',
-                    TILL_PAYMENTS_EXTENSION_URL => 'Live (Production)'
+                    TILL_PAYMENTS_V1_10_5_EXTENSION_URL_TEST => 'Test (Sandbox)',
+                    TILL_PAYMENTS_V1_10_5_EXTENSION_URL => 'Live (Production)'
                 ],
             ],
             'apiUser' => [
