@@ -51,6 +51,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             'refunds'
         );
 
+        // Show payment fields on checkout (seamless form)
+        $this->has_fields = true;
+
         $this->title = $this->get_option('title');
         $this->callbackUrl = add_query_arg('wc-api', 'wc_' . $this->id, home_url('/'));
 
