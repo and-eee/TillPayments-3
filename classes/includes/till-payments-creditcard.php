@@ -433,6 +433,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                                 expiry: $expiry.val()
                                             });
 
+                                            // Show payment processing loader
+                                            $('#till-payments-processing-overlay').addClass('active');
+                                            console.log('✓ Payment processing loader shown');
+
                                             // Submit form with safe metadata
                                             $form.closest('form').submit();
                                         });
@@ -448,11 +452,18 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                             expiry: $expiry.val()
                                         });
 
+                                        // Show payment processing loader
+                                        $('#till-payments-processing-overlay').addClass('active');
+                                        console.log('✓ Payment processing loader shown');
+
                                         $form.closest('form').submit();
                                     }
                                 },
                                 function(errors) {
                                     console.error('Payment errors:', errors);
+                                    // Hide loader on error
+                                    $('#till-payments-processing-overlay').removeClass('active');
+                                    console.log('✓ Payment processing loader hidden (error)');
                                     $errors.html(errors.map(e => e.message).join('<br>'));
                                 });
 
