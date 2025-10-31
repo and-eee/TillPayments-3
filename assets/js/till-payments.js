@@ -100,8 +100,13 @@
 	            await waitForScript(`[data-main="payment-js"]`).then(p => {
 	                payment = p;
 	                payment.init(integrationKey, $seamlessCardNumberInput.prop('id'), $seamlessCvvInput.prop('id'), function (payment) {
-	                x = document.getElementsByClassName('payment_method_till_payments_creditcard');
-	                x[1].style.background = 'transparent';
+	                // Find the payment method container dynamically (works with versioned gateway IDs)
+	                var paymentMethodElements = document.querySelectorAll('[class*="payment_method_"]');
+	                paymentMethodElements.forEach(function(element) {
+	                    if (element.className.includes('till_payments') && element.className.includes('creditcard')) {
+	                        element.style.background = 'transparent';
+	                    }
+	                });
 					
 					// remove WP injected br tags 
 					const paymentBoxes = document.querySelectorAll('#payment > ul > li > div > div.payment_box');
