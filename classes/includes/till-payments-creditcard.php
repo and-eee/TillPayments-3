@@ -125,9 +125,24 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         });
 
                         if ($form.length === 0) {
-                            console.error('✗ Form not found');
+                            console.error('✗ Form not found in DOM');
+                            console.log('Searching for any element with id containing "seamless":');
+                            $('[id*="seamless"]').each(function() {
+                                console.log('  Found:', this.id, 'parent:', this.parentElement.className);
+                            });
                             return;
                         }
+
+                        // Log form details
+                        console.log('✓ Form details:');
+                        console.log('  - Parent class:', $form.parent().attr('class'));
+                        console.log('  - Closest payment_box:', $form.closest('.payment_box').length);
+                        console.log('  - Form width:', $form.width());
+                        console.log('  - Form height:', $form.height());
+                        console.log('  - Form offset top:', $form.offset().top);
+                        console.log('  - Form CSS display:', $form.css('display'));
+                        console.log('  - Form CSS visibility:', $form.css('visibility'));
+                        console.log('  - Form CSS overflow:', $form.css('overflow'));
 
                         // Initialize PaymentJs
                         var payment = new PaymentJs('1.3');
