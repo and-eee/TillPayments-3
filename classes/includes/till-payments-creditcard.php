@@ -1757,7 +1757,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         }
         </style>
         <div id="till_payments_errors"></div>
+        <div id="till_payments_overlay"></div>
         <div id = "loader"></div>
+        <div id="till_payments_processing_message"></div>
         <div id="till_payments_seamless" style="display: block !important; visibility: visible !important; width: 100%;">
             <input type="hidden" id="till_payments_token" name="token">
             <p class="form-row form-row-wide" style="height: 80px; display: block !important;">
