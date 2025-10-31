@@ -6,10 +6,10 @@ use TillPayments\Client\Transaction\Debit;
 use TillPayments\Client\Transaction\Preauthorize;
 use TillPayments\Client\Transaction\Refund;
 
-if (!class_exists('WC_TillPayments_GooglePay')) {
-    class WC_TillPayments_GooglePay extends WC_Payment_Gateway
+if (!class_exists('WC_TillPayments_V1_10_5_GooglePay')) {
+    class WC_TillPayments_V1_10_5_GooglePay extends WC_Payment_Gateway
     {
-    public $id = 'googlepay';
+    public $id = 'googlepay_v1_10_5';
 
     public $method_title = 'Google Pay';
 
