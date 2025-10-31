@@ -1099,6 +1099,60 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     public function payment_fields()
     {
+        // Display saved cards for logged-in users
+        if (is_user_logged_in()) {
+            $userId = get_current_user_id();
+            $savedCards = $this->getSavedCards($userId);
+
+            if (!empty($savedCards)) {
+                echo '<div style="margin-bottom: 20px;">';
+                echo '<p style="font-weight: bold; margin-bottom: 10px;">Use a saved card:</p>';
+
+                foreach ($savedCards as $cardId => $card) {
+                    $cardDisplay = $card['brand'] . ' ending in ' . $card['last_4'];
+                    if (!empty($card['expiry'])) {
+                        $cardDisplay .= ' (' . $card['expiry'] . ')';
+                    }
+
+                    echo '<label style="display: block; margin-bottom: 8px; cursor: pointer;">
+                        <input type="radio" name="till_payments_card_selection" value="' . esc_attr($cardId) . '" style="margin-right: 8px;">
+                        ' . esc_html($cardDisplay) . '
+                    </label>';
+                }
+
+                echo '<label style="display: block; margin-bottom: 8px; cursor: pointer;">
+                    <input type="radio" name="till_payments_card_selection" value="new_card" checked="checked" style="margin-right: 8px;">
+                    Use a new card
+                </label>';
+                echo '</div>';
+
+                // JavaScript to hide/show new card form
+                echo '<script>
+                (function() {
+                    var toggleNewCardForm = function() {
+                        var selection = document.querySelector("input[name=\"till_payments_card_selection\"]:checked");
+                        if (selection && selection.value !== "new_card") {
+                            document.getElementById("till_payments_new_card_form").style.display = "none";
+                        } else {
+                            document.getElementById("till_payments_new_card_form").style.display = "block";
+                        }
+                    };
+
+                    // Listen for radio button changes
+                    var radios = document.querySelectorAll("input[name=\"till_payments_card_selection\"]");
+                    radios.forEach(function(radio) {
+                        radio.addEventListener("change", toggleNewCardForm);
+                    });
+
+                    // Initial state
+                    setTimeout(toggleNewCardForm, 100);
+                })();
+                </script>';
+            }
+        }
+
+        // New card form (only shown if no saved cards or user selects "new card")
+        echo '<div id="till_payments_new_card_form">';
         echo '
         <style>.payment_box iframe { width: 100%!important } #till_payments_errors{color: red; } 
         #loader {
