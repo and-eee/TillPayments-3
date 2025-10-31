@@ -26,8 +26,10 @@ define('TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_
 define('TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY', 'exGKVg98OepQoyTzZTEz');
 
 /**
- * Automatic Settings Migration
- * When this plugin is activated, copy settings from the original Till Payments plugin
+ * Automatic Settings Migration & Rewrite Rules Setup
+ * When this plugin is activated:
+ * 1. Copy settings from the original Till Payments plugin
+ * 2. Flush rewrite rules so the saved cards endpoint works
  * This ensures the v1.10.5 plugin has its own independent copy of settings
  */
 register_activation_hook(__FILE__, function() {
@@ -74,6 +76,11 @@ register_activation_hook(__FILE__, function() {
             update_option('till_payments_v1_10_5_settings_migrated', 'yes');
         }
     }
+
+    // IMPORTANT: Flush rewrite rules so WordPress recognizes the saved cards endpoint
+    // The endpoint is registered with add_rewrite_endpoint() below, but it won't work
+    // until rewrite rules are flushed
+    flush_rewrite_rules();
 });
 
 // Define global function at plugin load time (before plugins_loaded hook)
