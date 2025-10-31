@@ -1274,9 +1274,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             // 3ds:browserUserAgent
 
             /**
-             * force 3ds flow
+             * 3DS Secure - DISABLED
+             * Previously set to 'mandatory' but disabled per user request
              */
-            '3dsecure' => 'mandatory',
+            // '3dsecure' => 'mandatory',
 
             /**
              * Additional 3ds 2.0 data
