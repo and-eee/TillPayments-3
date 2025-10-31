@@ -1385,8 +1385,15 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         }
 
         // Explicitly save order and metadata to ensure all changes persist
-        $this->order->save_meta_data();
-        $this->order->save();
+        try {
+            if (method_exists($this->order, 'save_meta_data')) {
+                $this->order->save_meta_data();
+            }
+            $this->order->save();
+        } catch (\Exception $e) {
+            // Log error but don't break callback
+            error_log('Till Payments v1.10.5 callback save error: ' . $e->getMessage());
+        }
 
         die("OK");
     }
