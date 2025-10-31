@@ -697,9 +697,6 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('payment_js_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
-        wp_enqueue_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
-
         // Output integration key using wp_add_inline_script to avoid WooCommerce filtering
         wp_add_inline_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'window.integrationKey_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID . '="' . TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY . '";', 'before');
 
