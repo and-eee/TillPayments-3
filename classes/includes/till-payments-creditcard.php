@@ -1070,10 +1070,6 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 </span>
             </p>
             <div style="clear: both;"></div>
-        </div>
-        <div style="background-color: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 3px; padding: 12px; margin-top: 15px; font-size: 13px; color: #666;">
-            <p style="margin: 0 0 8px 0;"><strong>Credit Card Surcharge:</strong> 1.2%</p>
-            <p style="margin: 0;"><strong>Note:</strong> An invoice and payment receipt will automatically be emailed to you.</p>
         </div>';
     }
 
