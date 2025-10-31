@@ -96,7 +96,12 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('wp_enqueue_scripts', function () {
             wp_register_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, plugins_url('/tillpayments/assets/js/till-applepay.js'), ['jquery'], TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION, false);
-        }, 999);
+
+            // Enqueue scripts on checkout/pay pages
+            if (is_checkout() || is_checkout_pay_page()) {
+                wp_enqueue_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
+            }
+        }, 10);
         add_action('woocommerce_api_wc_' . $this->id, [$this, 'process_callback']);
         add_action('woocommerce_api_wc_' . $this->id . '_applepay_session', [$this, 'start_applepay_session']);
         add_action('woocommerce_api_wc_' . $this->id . '_debuglog', [$this, 'debuglog']);
