@@ -1223,7 +1223,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             </p>';
         }
 
-        echo '</div>';
+        echo '</div>'; // Close new card form div
+        echo '</div>'; // Close payment_box div
     }
 
     /**
