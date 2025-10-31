@@ -134,15 +134,35 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         }
 
                         // Log form details
-                        console.log('✓ Form details:');
-                        console.log('  - Parent class:', $form.parent().attr('class'));
-                        console.log('  - Closest payment_box:', $form.closest('.payment_box').length);
+                        console.log('✓ Form details (BEFORE sizing):');
                         console.log('  - Form width:', $form.width());
                         console.log('  - Form height:', $form.height());
-                        console.log('  - Form offset top:', $form.offset().top);
-                        console.log('  - Form CSS display:', $form.css('display'));
-                        console.log('  - Form CSS visibility:', $form.css('visibility'));
-                        console.log('  - Form CSS overflow:', $form.css('overflow'));
+
+                        // CRITICAL FIX: Set explicit dimensions so form is visible
+                        $form.css({
+                            'min-width': '100%',
+                            'width': '100%',
+                            'min-height': '400px',
+                            'height': 'auto',
+                            'display': 'block',
+                            'visibility': 'visible',
+                            'opacity': '1'
+                        });
+
+                        // Also ensure parent payment_box is visible
+                        var $paymentBox = $form.closest('.payment_box');
+                        $paymentBox.css({
+                            'min-width': '100%',
+                            'width': '100%',
+                            'display': 'block',
+                            'visibility': 'visible',
+                            'opacity': '1'
+                        });
+
+                        console.log('✓ Form details (AFTER sizing):');
+                        console.log('  - Form width:', $form.width());
+                        console.log('  - Form height:', $form.height());
+                        console.log('  - Parent class:', $form.parent().attr('class'));
 
                         // Initialize PaymentJs
                         var payment = new PaymentJs('1.3');
