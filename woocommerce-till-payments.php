@@ -93,14 +93,20 @@ add_action('till_payments_v1_10_5_flush_rewrite_rules', function () {
 
 /**
  * Also flush rewrite rules in plugins_loaded hook to handle fresh installs
+ * This runs after the endpoint is registered (priority 1)
  */
 add_action('plugins_loaded', function () {
-    // Check if we need to flush rules (first time setup)
+    // Check if we need to flush rules (first time setup or after reactivation)
     $flushed = get_option('till_payments_v1_10_5_rewrite_rules_flushed');
     if (!$flushed) {
-        // Mark that we've flushed, then do the flush
+        // Mark that we've flushed
         update_option('till_payments_v1_10_5_rewrite_rules_flushed', 'yes');
-        // Use a small delay to ensure endpoint is registered first
+
+        // IMPORTANT: Immediate flush to ensure endpoint works right away
+        // This is critical for fresh installations
+        flush_rewrite_rules(false);
+
+        // Also schedule for extra safety (in case immediate flush doesn't work)
         wp_schedule_single_event(time() + 1, 'till_payments_v1_10_5_flush_rewrite_rules');
     }
 }, 2); // Priority 2 = after the endpoint registration (priority 1)
