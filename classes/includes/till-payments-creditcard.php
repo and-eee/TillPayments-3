@@ -313,7 +313,7 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
          * integration key is set -> seamless
          * proceed to pay now page or apply submitted transaction token
          */
-        if ($this->get_option('integrationKey')) {
+        if (TILL_PAYMENTS_INTEGRATION_KEY) {
             $token = !empty($this->get_post_data()['token']) ? $this->get_post_data()['token'] : null;
             if (!$token) {
                 return [
