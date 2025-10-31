@@ -142,7 +142,12 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
      */
     public function get_option($key, $empty_value = null)
     {
-        // Get settings from the original gateway ID instead of this namespaced version
+        // Special handling for 'enabled' - read from our own settings so enable/disable works
+        if ($key === 'enabled') {
+            return parent::get_option($key, $empty_value);
+        }
+
+        // Get all other settings from the original gateway ID
         $option_key = 'woocommerce_' . $this->original_gateway_id . '_settings';
         $all_settings = get_option($option_key);
 
