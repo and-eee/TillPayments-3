@@ -1427,15 +1427,29 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             switch ($callbackResult->getTransactionType()) {
                 case \TillPayments\Client\Callback\Result::TYPE_DEBIT:
                 case \TillPayments\Client\Callback\Result::TYPE_CAPTURE:
+                    // Extract payment details from callback for customer receipt
+                    $paymentDetails = $this->extractPaymentDetailsFromCallback($callbackResult);
+
                     // Only process if not already processed by direct payment response
                     if ($alreadyProcessed !== 'yes') {
                         $this->order->payment_complete($callbackResult->getReferenceId());
-                        $this->order->add_order_note('TillPayments callback processed: ' . $callbackResult->getReferenceId(), false);
+
+                        // Add professional payment receipt note with details
+                        $this->addPaymentReceiptNote($paymentDetails);
+
+                        // Store payment details in order meta for display on receipts/emails
+                        $this->order->add_meta_data('payment_details_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $paymentDetails, true);
+
                         // Mark as processed to prevent duplicate processing
                         $this->order->add_meta_data('payment_processed_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
                     } else {
                         // Payment already processed by direct response, just log callback confirmation
                         $this->order->add_order_note('TillPayments callback confirmation (already processed): ' . $callbackResult->getReferenceId(), false);
+
+                        // Still store payment details if not already stored
+                        if (!$this->order->get_meta('payment_details_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID)) {
+                            $this->order->add_meta_data('payment_details_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $paymentDetails, true);
+                        }
                     }
                     break;
                 case \TillPayments\Client\Callback\Result::TYPE_VOID:
