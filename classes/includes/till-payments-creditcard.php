@@ -144,19 +144,38 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                             'width': '100%',
                             'min-height': '400px',
                             'height': 'auto',
-                            'display': 'block',
-                            'visibility': 'visible',
-                            'opacity': '1'
+                            'display': 'block !important',
+                            'visibility': 'visible !important',
+                            'opacity': '1 !important',
+                            'position': 'relative',
+                            'left': 'auto',
+                            'top': 'auto',
+                            'z-index': '9999'
                         });
 
-                        // Also ensure parent payment_box is visible
+                        // Ensure parent payment_box is visible and properly positioned
                         var $paymentBox = $form.closest('.payment_box');
                         $paymentBox.css({
                             'min-width': '100%',
                             'width': '100%',
-                            'display': 'block',
-                            'visibility': 'visible',
-                            'opacity': '1'
+                            'display': 'block !important',
+                            'visibility': 'visible !important',
+                            'opacity': '1 !important',
+                            'position': 'relative',
+                            'left': 'auto',
+                            'top': 'auto',
+                            'z-index': '9998',
+                            'min-height': '450px'
+                        });
+
+                        // Ensure parent LI is visible
+                        var $li = $paymentBox.closest('li');
+                        $li.css({
+                            'display': 'block !important',
+                            'visibility': 'visible !important',
+                            'opacity': '1 !important',
+                            'position': 'relative',
+                            'min-height': '450px'
                         });
 
                         console.log('✓ Form details (AFTER sizing):');
