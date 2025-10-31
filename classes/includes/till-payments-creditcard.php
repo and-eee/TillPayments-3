@@ -220,10 +220,27 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                             // Setup validation
                             var validNumber = false;
                             var validCvv = false;
+                            var capturedCardLast4 = null;
 
                             payment.numberOn('input', function(data) {
                                 validNumber = data.validNumber;
                                 console.log('Card valid:', validNumber);
+
+                                // Try to capture last 4 digits from validation data
+                                // PaymentJs may provide card metadata in the validation response
+                                if (data && data.last4) {
+                                    capturedCardLast4 = data.last4;
+                                    console.log('✓ Captured last 4 from validation:', capturedCardLast4);
+                                } else if (data && data.lastFour) {
+                                    capturedCardLast4 = data.lastFour;
+                                    console.log('✓ Captured last 4 from validation:', capturedCardLast4);
+                                } else if (data && data.cardData && data.cardData.last4) {
+                                    capturedCardLast4 = data.cardData.last4;
+                                    console.log('✓ Captured last 4 from cardData:', capturedCardLast4);
+                                }
+
+                                // Log what we get for debugging
+                                console.log('Payment data available:', Object.keys(data));
                             });
 
                             payment.cvvOn('input', function(data) {
