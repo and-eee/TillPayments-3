@@ -207,6 +207,19 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                             });
 
                             console.log('✓ Form ready for payment');
+
+                            // Monitor for form being hidden
+                            setInterval(function() {
+                                var display = $form.css('display');
+                                var visibility = $form.css('visibility');
+                                if (display === 'none' || visibility === 'hidden') {
+                                    console.warn('✗ FORM WAS HIDDEN! display:', display, 'visibility:', visibility);
+                                    $form.show();
+                                    $form.css('display', 'block');
+                                    $form.css('visibility', 'visible');
+                                    console.log('✓ Re-showing form');
+                                }
+                            }, 100);
                         });
                     };
                 };
