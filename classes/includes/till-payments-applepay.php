@@ -92,7 +92,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('wp_enqueue_scripts', function () {
-            wp_register_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, plugins_url('/tillpayments/assets/js/till-applepay.js'), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
+            wp_register_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, plugins_url('/tillpayments/assets/js/till-applepay.js'), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
         }, 999);
         add_action('woocommerce_api_wc_' . $this->id, [$this, 'process_callback']);
         add_action('woocommerce_api_wc_' . $this->id . '_applepay_session', [$this, 'start_applepay_session']);
@@ -100,7 +100,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
         add_action(
             'woocommerce_order_item_add_action_buttons',
             function(WC_Order $order) {
-                if ($order->get_meta('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID) === 'yes' && $order->get_payment_method() === $this->id) {
+                if ($order->get_meta('pending_capture_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID) === 'yes' && $order->get_payment_method() === $this->id) {
                     echo sprintf(
                         '<button
                             id="tillpayments_capture_payment_%s"
@@ -109,9 +109,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
                             data-order-id="%s"
                             data-version-id="%s"
                             data-payment-method="%s">Capture Payment</button>',
-                        esc_attr(TILL_PAYMENTS_EXTENSION_VERSION_ID),
+                        esc_attr(TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID),
                         esc_attr($order->get_id()),
-                        esc_attr(TILL_PAYMENTS_EXTENSION_VERSION_ID),
+                        esc_attr(TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID),
                         esc_attr($this->id)
                     );
                 }
@@ -310,7 +310,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
 
         $orderTxId = $this->encodeOrderId($order_id);
         // keep track of last tx id
-        $this->order->add_meta_data('orderTxId_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $orderTxId, true); 
+        $this->order->add_meta_data('orderTxId_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $orderTxId, true); 
         $this->order->save_meta_data();
         $transaction->setTransactionId($orderTxId)
             ->setAmount(floatval($this->order->get_total()))
@@ -350,7 +350,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
                 return $this->paymentFailedResponse();
             } elseif ($result->getReturnType() == TillPayments\Client\Transaction\Result::RETURN_TYPE_REDIRECT) {
                 $this->log('  > return type: REDIRECT');
-                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 $this->log('  > redirect URL: '.$result->getRedirectUrl());
@@ -368,7 +368,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
                  * payment is pending, wait for callback to complete
                  */
             } elseif ($result->getReturnType() == TillPayments\Client\Transaction\Result::RETURN_TYPE_FINISHED) {
-                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 switch ($transactionRequest) {
@@ -390,7 +390,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
             }
 
             if ($transactionRequest === 'preauthorize') {
-                $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'yes', true);
+                $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
                 $this->order->save_meta_data();
             }
 
@@ -450,7 +450,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
         $transaction->setTransactionId($refundTxId)
             ->setAmount(floatval($amount))
             ->setCurrency($this->order->get_currency())
-            ->setReferenceTransactionId($this->order->get_meta('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID))
+            ->setReferenceTransactionId($this->order->get_meta('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID))
             ->setCallbackUrl($this->callbackUrl);
 
         /**
@@ -552,7 +552,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
         $this->order = new WC_Order($this->decodeOrderId($callbackResult->getTransactionId()));
 
         // check if callback data is coming from the last (=newest+relevant) tx attempt, otherwise ignore it
-        if ($this->order->get_meta('orderTxId_' . TILL_PAYMENTS_EXTENSION_VERSION_ID) !== $callbackResult->getTransactionId()) {
+        if ($this->order->get_meta('orderTxId_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID) !== $callbackResult->getTransactionId()) {
             die("OK");
         }
         
@@ -896,7 +896,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
+        wp_enqueue_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
 
         $applePayFrontendConfig = [
             'button_type' => $this->get_option('button_type'),
@@ -913,7 +913,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
             'debuglog_url' => $this->debugLogUrl,
         ];
 
-        wp_add_inline_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'window.applePay = '.json_encode($applePayFrontendConfig), 'before');
+        wp_add_inline_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'window.applePay = '.json_encode($applePayFrontendConfig), 'before');
 
         echo '<style>
         #till_payments_applepay_errors {color: red; }
