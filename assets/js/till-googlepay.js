@@ -77,6 +77,10 @@
         $paymentForm.submit();
       },
       errorCallback: function (err) {
+        // Hide loader, message, and overlay on error
+        $('#loader').hide();
+        $('#till_payments_processing_message').hide();
+        $('#till_payments_overlay').hide();
         if (err.hasOwnProperty("statusCode") && err.statusCode === "CANCELED") {
           $tillPaymentsErrors.html("Payment was cancelled by the user.");
           console.error("Payment was cancelled by the user.");
