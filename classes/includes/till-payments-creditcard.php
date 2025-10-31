@@ -1069,8 +1069,17 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                     <span id="till_payments_seamless_cvv" style="padding: 0; height: 52px !important; width: 100% !important; border-radius: 3px; display: block !important; visibility: visible !important;"></span>
                 </span>
             </p>
-            <div style="clear: both;"></div>
-        </div>';
+            <div style="clear: both;"></div>';
+
+        // Show save card checkbox for logged-in users
+        if (is_user_logged_in()) {
+            echo '<p class="form-row form-row-wide" style="margin-top: 15px;">
+                <input type="checkbox" id="till_payments_save_card" name="till_payments_save_card" value="yes" style="width: auto; margin-right: 8px;">
+                <label for="till_payments_save_card" style="display: inline; font-weight: normal;">Save this card for future purchases</label>
+            </p>';
+        }
+
+        echo '</div>';
     }
 
     /**
