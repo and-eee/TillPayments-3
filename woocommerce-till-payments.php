@@ -105,6 +105,17 @@ add_action('plugins_loaded', function () {
     }
 }, 2); // Priority 2 = after the endpoint registration (priority 1)
 
+/**
+ * Deactivation hook - clean up when plugin is disabled
+ */
+register_deactivation_hook(__FILE__, function() {
+    // Reset the flush flag so rewrite rules will be re-generated on reactivation
+    delete_option('till_payments_v1_10_5_rewrite_rules_flushed');
+
+    // Flush rewrite rules to remove the endpoint
+    flush_rewrite_rules();
+});
+
 // Define global function at plugin load time (before plugins_loaded hook)
 if (!function_exists('woocommerce_clear_cart_url_v1_10_5')) {
     function woocommerce_clear_cart_url_v1_10_5() {
