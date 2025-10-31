@@ -35,6 +35,11 @@ if (!defined('TILL_PAYMENTS_EXTENSION_VERSION_ID')) {
     define('TILL_PAYMENTS_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_PAYMENTS_EXTENSION_VERSION));
 }
 
+// Hard-coded integration key for this plugin instance
+if (!defined('TILL_PAYMENTS_INTEGRATION_KEY')) {
+    define('TILL_PAYMENTS_INTEGRATION_KEY', 'exGKVg98OepQoyTzZTEz');
+}
+
 // Define global function at plugin load time (before plugins_loaded hook)
 if (!function_exists('woocommerce_clear_cart_url')) {
     function woocommerce_clear_cart_url() {
