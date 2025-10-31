@@ -77,39 +77,9 @@ register_activation_hook(__FILE__, function() {
         }
     }
 
-    // IMPORTANT: Schedule rewrite rules flush for after plugin loading completes
-    // The endpoint won't be registered yet (it's in plugins_loaded hook),
-    // so we schedule this to run after WordPress is fully initialized
-    wp_schedule_single_event(time(), 'till_payments_v1_10_5_flush_rewrite_rules');
+    // Note: Rewrite rules will be automatically flushed by WordPress when needed
+    // The endpoint is registered in the init hook, which is the correct place
 });
-
-/**
- * Flush rewrite rules after plugin is fully loaded
- * This happens after the endpoint registration in plugins_loaded hook
- */
-add_action('till_payments_v1_10_5_flush_rewrite_rules', function () {
-    flush_rewrite_rules();
-});
-
-/**
- * Also flush rewrite rules in plugins_loaded hook to handle fresh installs
- * This runs after the endpoint is registered (priority 1)
- */
-add_action('plugins_loaded', function () {
-    // Check if we need to flush rules (first time setup or after reactivation)
-    $flushed = get_option('till_payments_v1_10_5_rewrite_rules_flushed');
-    if (!$flushed) {
-        // Mark that we've flushed
-        update_option('till_payments_v1_10_5_rewrite_rules_flushed', 'yes');
-
-        // IMPORTANT: Immediate flush to ensure endpoint works right away
-        // This is critical for fresh installations
-        flush_rewrite_rules(false);
-
-        // Also schedule for extra safety (in case immediate flush doesn't work)
-        wp_schedule_single_event(time() + 1, 'till_payments_v1_10_5_flush_rewrite_rules');
-    }
-}, 2); // Priority 2 = after the endpoint registration (priority 1)
 
 /**
  * Deactivation hook - clean up when plugin is disabled
