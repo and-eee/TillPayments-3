@@ -1758,7 +1758,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
-          margin-top: 50px;
+          margin-top: 15px;
           color: #333333;
           font-size: 14px;
           line-height: 1.5;
