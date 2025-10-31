@@ -188,23 +188,23 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
     }
 
     /**
-     * Process admin options. This is used to process uploaded files.
-     *
-     * @return bool
+     * Override process_admin_options to prevent saving all settings
+     * Only allow the 'enabled' toggle to save to our settings
      */
-    public function process_admin_options() {
-        foreach (['certificate', 'private_key'] as $_fieldname) {
-            $fieldname = 'woocommerce_'.$this->id.'_'.$_fieldname;
-            if (array_key_exists($fieldname, $_FILES) && $_FILES[$fieldname]['size'] > 0) {
-                $_POST[$fieldname] = base64_encode(file_get_contents($_FILES[$fieldname]['tmp_name']));
-                unlink($_FILES[$fieldname]['tmp_name']);
-                unset($_FILES[$fieldname]);
-            } else {
-                $_POST[$fieldname] = $this->get_option($_fieldname);
-            }
+    public function process_admin_options()
+    {
+        // Only save the 'enabled' setting to our own gateway settings
+        if (isset($_POST['woocommerce_' . $this->id . '_enabled'])) {
+            update_option('woocommerce_' . $this->id . '_enabled', 'yes');
+        } else {
+            update_option('woocommerce_' . $this->id . '_enabled', 'no');
         }
 
-        return parent::process_admin_options();
+        // Don't call parent to prevent saving other settings
+        // Instead show a message that settings are managed by the original plugin
+        WC_Admin_Settings::add_message(__('Settings are managed by the original Till Payments plugin. Enable/disable status saved.', 'woocommerce'));
+
+        return false;
     }
 
     public function hide_payment_gateways_on_pay_for_order_page($available_gateways)
