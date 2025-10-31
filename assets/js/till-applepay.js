@@ -157,6 +157,11 @@
                 var $checkoutForm = $paymentFormTokenInput.closest('form')[0];
                 var formData = new FormData($checkoutForm);
 
+                // Show loader, message, and overlay
+                $('#loader').show();
+                $('#till_payments_processing_message').html('Please don\'t close or refresh this page while we process your payment').show();
+                $('#till_payments_overlay').show();
+
                 fetch(
                     wc_checkout_params.checkout_url,
                     {
