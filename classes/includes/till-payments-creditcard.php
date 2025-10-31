@@ -1392,6 +1392,119 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         ];
     }
 
+    /**
+     * Extract professional payment details from the callback for customer receipt
+     *
+     * @param mixed $callbackResult The callback result object from Till Payments
+     * @return array Payment details formatted for display
+     */
+    private function extractPaymentDetailsFromCallback($callbackResult)
+    {
+        $details = [
+            'reference_id' => $callbackResult->getReferenceId(),
+            'transaction_id' => $callbackResult->getTransactionId(),
+            'purchase_id' => $callbackResult->getPurchaseId(),
+            'amount' => $callbackResult->getAmount(),
+            'currency' => $callbackResult->getCurrency(),
+            'transaction_type' => $callbackResult->getTransactionType(),
+        ];
+
+        // Extract auth code if available
+        try {
+            $extraData = $callbackResult->getExtraDataArray();
+            if (isset($extraData['authCode'])) {
+                $details['auth_code'] = $extraData['authCode'];
+            }
+        } catch (\Exception $e) {
+            $this->log('Error extracting auth code from callback: ' . $e->getMessage(), WC_Log_Levels::WARNING);
+        }
+
+        // Extract card details if available (from returnData)
+        try {
+            $returnData = $callbackResult->getReturnData();
+            if (is_array($returnData) && isset($returnData['type'])) {
+                $details['card_type'] = strtoupper($returnData['type']);
+                $details['card_holder'] = isset($returnData['cardHolder']) ? $returnData['cardHolder'] : '';
+                $details['last_four'] = isset($returnData['lastFourDigits']) ? $returnData['lastFourDigits'] : '';
+                $details['expiry'] = '';
+                if (isset($returnData['expiryMonth']) && isset($returnData['expiryYear'])) {
+                    $details['expiry'] = str_pad($returnData['expiryMonth'], 2, '0', STR_PAD_LEFT) . '/' . substr($returnData['expiryYear'], -2);
+                }
+                $details['bin_bank'] = isset($returnData['binBank']) ? $returnData['binBank'] : '';
+                $details['bin_type'] = isset($returnData['binType']) ? $returnData['binType'] : '';
+                $details['bin_country'] = isset($returnData['binCountry']) ? $returnData['binCountry'] : '';
+                $details['three_d_secure'] = isset($returnData['threeDSecure']) ? $returnData['threeDSecure'] : 'OFF';
+            }
+        } catch (\Exception $e) {
+            $this->log('Error extracting card details from callback: ' . $e->getMessage(), WC_Log_Levels::WARNING);
+        }
+
+        return $details;
+    }
+
+    /**
+     * Add a professional payment receipt note to the order
+     * Formats payment details nicely for the order notes
+     *
+     * @param array $paymentDetails Payment details from callback
+     */
+    private function addPaymentReceiptNote($paymentDetails)
+    {
+        $note = "✓ Payment Confirmed\n";
+        $note .= "─────────────────────────\n";
+
+        // Card information
+        if (!empty($paymentDetails['card_type']) && !empty($paymentDetails['last_four'])) {
+            $note .= $paymentDetails['card_type'] . ' ending in ' . $paymentDetails['last_four'];
+            if (!empty($paymentDetails['expiry'])) {
+                $note .= " (Exp: " . $paymentDetails['expiry'] . ")";
+            }
+            $note .= "\n";
+
+            // Card holder name if available
+            if (!empty($paymentDetails['card_holder'])) {
+                $note .= "Cardholder: " . $paymentDetails['card_holder'] . "\n";
+            }
+
+            // Bank details
+            if (!empty($paymentDetails['bin_bank'])) {
+                $note .= "Bank: " . $paymentDetails['bin_bank'] . "\n";
+            }
+            if (!empty($paymentDetails['bin_type'])) {
+                $note .= "Card Type: " . $paymentDetails['bin_type'] . "\n";
+            }
+
+            $note .= "\n";
+        }
+
+        // Transaction details
+        $note .= "Amount: " . $paymentDetails['currency'] . " " . number_format($paymentDetails['amount'], 2) . "\n";
+        if (!empty($paymentDetails['auth_code'])) {
+            $note .= "Authorization: " . $paymentDetails['auth_code'] . "\n";
+        }
+        $note .= "Reference: " . $paymentDetails['reference_id'] . "\n";
+
+        // 3DS status if relevant
+        if (!empty($paymentDetails['three_d_secure']) && $paymentDetails['three_d_secure'] !== 'OFF') {
+            $note .= "3D Secure: " . $paymentDetails['three_d_secure'] . "\n";
+        }
+
+        $this->order->add_order_note($note, false);
+
+        // Log for audit trail
+        $this->log(
+            sprintf(
+                'AUDIT: Payment receipt note added | Order: %d | Card: %s | Auth: %s | Ref: %s',
+                $this->order->get_id(),
+                isset($paymentDetails['card_type']) ? $paymentDetails['card_type'] . ' •••• ' . $paymentDetails['last_four'] : 'N/A',
+                $paymentDetails['auth_code'] ?? 'N/A',
+                $paymentDetails['reference_id']
+            ),
+            WC_Log_Levels::INFO,
+            'CardOperations'
+        );
+    }
+
     public function process_callback()
     {
         WC_TillPayments_V1_10_5_Provider::autoloadClient();
