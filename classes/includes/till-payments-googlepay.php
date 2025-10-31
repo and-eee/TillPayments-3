@@ -57,8 +57,8 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('wp_enqueue_scripts', function () {
-            wp_register_script('till_googlepay_js_' . $this->id, plugins_url('/tillpayments/assets/js/till-googlepay.js'), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
-            wp_register_script('till_googlepay_loader_js_' . $this->id, plugins_url('/tillpayments/assets/js/google-pay-loader.js'), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
+            wp_register_script('till_googlepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, plugins_url('/tillpayments/assets/js/till-googlepay.js'), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
+            wp_register_script('till_googlepay_loader_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, plugins_url('/tillpayments/assets/js/google-pay-loader.js'), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
         }, 999);
 
         add_action('woocommerce_api_wc_' . $this->id, [$this, 'process_callback']);
