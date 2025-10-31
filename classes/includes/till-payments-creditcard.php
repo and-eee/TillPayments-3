@@ -138,11 +138,11 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         console.log('  - Form width:', $form.width());
                         console.log('  - Form height:', $form.height());
 
-                        // CRITICAL FIX: Set explicit dimensions so form is visible
+                        // Set dimensions - form will size to content naturally
                         $form.css({
                             'min-width': '100%',
                             'width': '100%',
-                            'min-height': '400px',
+                            'min-height': 'auto',
                             'height': 'auto',
                             'display': 'block !important',
                             'visibility': 'visible !important',
@@ -165,7 +165,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                             'left': 'auto',
                             'top': 'auto',
                             'z-index': '9998',
-                            'min-height': '450px'
+                            'min-height': 'auto'
                         });
 
                         // Ensure parent LI is visible
@@ -175,7 +175,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                             'visibility': 'visible !important',
                             'opacity': '1 !important',
                             'position': 'relative',
-                            'min-height': '450px'
+                            'min-height': 'auto'
                         });
 
                         console.log('✓ Form details (AFTER sizing):');
