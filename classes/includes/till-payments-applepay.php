@@ -896,7 +896,7 @@ if (!class_exists('WC_TillPayments_ApplePay')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('till_applepay_js_' . $this->id);
+        wp_enqueue_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
 
         $applePayFrontendConfig = [
             'button_type' => $this->get_option('button_type'),
@@ -913,7 +913,7 @@ if (!class_exists('WC_TillPayments_ApplePay')) {
             'debuglog_url' => $this->debugLogUrl,
         ];
 
-        wp_add_inline_script('till_applepay_js_' . $this->id, 'window.applePay = '.json_encode($applePayFrontendConfig), 'before');
+        wp_add_inline_script('till_applepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'window.applePay = '.json_encode($applePayFrontendConfig), 'before');
 
         echo '<style>
         #till_payments_applepay_errors {color: red; }
