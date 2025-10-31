@@ -879,13 +879,16 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             switch ($callbackResult->getTransactionType()) {
                 case \TillPayments\Client\Callback\Result::TYPE_DEBIT:
                 case \TillPayments\Client\Callback\Result::TYPE_CAPTURE:
-                    $this->order->payment_complete();
+                    $this->order->payment_complete($callbackResult->getReferenceId());
+                    $this->order->add_order_note('TillPayments callback processed: ' . $callbackResult->getReferenceId(), false);
                     break;
                 case \TillPayments\Client\Callback\Result::TYPE_VOID:
                     $this->order->update_status('cancelled', __('Void', 'woocommerce'));
+                    $this->order->add_order_note('TillPayments void processed', false);
                     break;
                 case \TillPayments\Client\Callback\Result::TYPE_PREAUTHORIZE:
                     $this->order->update_status('on-hold', __('Awaiting capture/void', 'woocommerce'));
+                    $this->order->add_order_note('TillPayments preauthorization completed', false);
                     break;
             }
         } elseif ($callbackResult->getResult() == \TillPayments\Client\Callback\Result::RESULT_ERROR) {
@@ -894,9 +897,13 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 case \TillPayments\Client\Callback\Result::TYPE_CAPTURE:
                 case \TillPayments\Client\Callback\Result::TYPE_VOID:
                     $this->order->update_status('failed', __('Error', 'woocommerce'));
+                    $this->order->add_order_note('TillPayments callback error: Payment processing failed', false);
                     break;
             }
         }
+
+        // Explicitly save order to ensure all changes persist
+        $this->order->save();
 
         die("OK");
     }
