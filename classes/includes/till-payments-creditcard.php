@@ -237,7 +237,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         /**
          * gateway client
          */
-        WC_TillPayments_Provider::autoloadClient();
+        WC_TillPayments_V1_10_5_Provider::autoloadClient();
         TillPayments\Client\Client::setApiUrl($this->get_option('apiHost'));
         $client = new TillPayments\Client\Client(
             $this->get_option('apiUser'),
@@ -430,7 +430,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         /**
          * gateway client
          */
-        WC_TillPayments_Provider::autoloadClient();
+        WC_TillPayments_V1_10_5_Provider::autoloadClient();
         TillPayments\Client\Client::setApiUrl($this->get_option('apiHost'));
         $client = new TillPayments\Client\Client(
             $this->get_option('apiUser'),
@@ -528,7 +528,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     public function process_callback()
     {
-        WC_TillPayments_Provider::autoloadClient();
+        WC_TillPayments_V1_10_5_Provider::autoloadClient();
 
         TillPayments\Client\Client::setApiUrl($this->get_option('apiHost'));
         $client = new TillPayments\Client\Client(
