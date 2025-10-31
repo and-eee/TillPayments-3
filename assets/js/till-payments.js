@@ -316,5 +316,14 @@
 	            init();
 	        }
 	    }, 500);
-	});
+	};
+
+	// Call immediately if document is ready, otherwise wait for ready
+	if (document.readyState === 'loading') {
+		console.log('→ Document still loading, waiting for ready');
+		$(document).ready(initTillPayments);
+	} else {
+		console.log('→ Document already ready, initializing immediately');
+		initTillPayments();
+	}
 })(jQuery);
