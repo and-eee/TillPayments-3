@@ -35,8 +35,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     {
         $this->logger = wc_get_logger();
 
-        $this->id = TILL_PAYMENTS_EXTENSION_UID_PREFIX . $this->id;
-        $this->method_description = TILL_PAYMENTS_EXTENSION_NAME . ' ' . $this->method_title . ' payments.';
+        $this->id = TILL_PAYMENTS_V1_10_5_EXTENSION_UID_PREFIX . $this->id;
+        $this->method_description = TILL_PAYMENTS_V1_10_5_EXTENSION_NAME . ' ' . $this->method_title . ' payments.';
 		$this->icon = 'https://s3.ap-southeast-2.amazonaws.com/images.simplepays.io/visa_mastercard+(2).png';
         $this->has_fields = isset($_GET['pay_for_order']);
 
