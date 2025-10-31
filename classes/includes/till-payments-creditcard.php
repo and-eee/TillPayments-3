@@ -1146,19 +1146,23 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         'last_4' => !empty($_POST['till_payments_card_last_4']) ? sanitize_text_field($_POST['till_payments_card_last_4']) : 'XXXX',
                         'brand' => !empty($_POST['till_payments_card_brand']) ? sanitize_text_field($_POST['till_payments_card_brand']) : 'Credit Card',
                         'expiry' => !empty($_POST['till_payments_card_expiry']) ? sanitize_text_field($_POST['till_payments_card_expiry']) : '',
+                        'nickname' => !empty($_POST['till_payments_card_nickname']) ? sanitize_text_field($_POST['till_payments_card_nickname']) : '',
                     ];
 
                     $savedCardId = $this->saveCardToken($userId, $vaultToken, $cardDetails);
                     if ($savedCardId) {
-                        $this->order->add_order_note('Card saved for future purchases', false);
+                        // Build card display name for order note
+                        $displayName = $cardDetails['nickname'] ? $cardDetails['nickname'] : $cardDetails['brand'];
+                        $this->order->add_order_note('Card saved for future purchases: ' . $displayName, false);
 
                         // SECURITY: Audit logging - card saved after successful payment
                         $this->log(
                             sprintf(
-                                'AUDIT: New card saved after payment | User: %d | Order: %d | Card ID: %s | Brand: %s | Last 4: %s',
+                                'AUDIT: New card saved after payment | User: %d | Order: %d | Card ID: %s | Nickname: %s | Brand: %s | Last 4: %s',
                                 $userId,
                                 $orderId,
                                 $savedCardId,
+                                $cardDetails['nickname'] ?: '(no nickname)',
                                 $cardDetails['brand'],
                                 $cardDetails['last_4']
                             ),
