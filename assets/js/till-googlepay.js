@@ -68,6 +68,10 @@
       processPaymentCallback: function (paymentData, paymentToken) {
         console.debug("GOOGLE PAY processPaymentCallback()");
         console.debug(paymentToken);
+        // Show loader, message, and overlay
+        $('#loader').show();
+        $('#till_payments_processing_message').html('Please don\'t close or refresh this page while we process your payment').show();
+        $('#till_payments_overlay').show();
         var $paymentFormTokenInput = $("#till_payments_googlepay_token");
         $paymentFormTokenInput.val("googlepay:" + paymentToken);
         $paymentForm.submit();
