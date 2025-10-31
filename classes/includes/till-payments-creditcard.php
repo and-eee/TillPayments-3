@@ -1327,15 +1327,25 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         if ($this->order->get_meta('orderTxId_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID) !== $callbackResult->getTransactionId()) {
             die("OK");
         }
-        
+
+        // IDEMPOTENCY: Check if payment was already processed by direct response
+        // This prevents duplicate processing when both direct response AND callback arrive
+        $alreadyProcessed = $this->order->get_meta('payment_processed_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
+
         if ($callbackResult->getResult() == \TillPayments\Client\Callback\Result::RESULT_OK) {
             switch ($callbackResult->getTransactionType()) {
                 case \TillPayments\Client\Callback\Result::TYPE_DEBIT:
                 case \TillPayments\Client\Callback\Result::TYPE_CAPTURE:
-                    $this->order->payment_complete($callbackResult->getReferenceId());
-                    $this->order->add_order_note('TillPayments callback processed: ' . $callbackResult->getReferenceId(), false);
-                    // Explicitly ensure status is set to processing
-                    $this->order->update_status('processing', 'Payment confirmed via callback');
+                    // Only process if not already processed by direct payment response
+                    if ($alreadyProcessed !== 'yes') {
+                        $this->order->payment_complete($callbackResult->getReferenceId());
+                        $this->order->add_order_note('TillPayments callback processed: ' . $callbackResult->getReferenceId(), false);
+                        // Mark as processed to prevent duplicate processing
+                        $this->order->add_meta_data('payment_processed_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
+                    } else {
+                        // Payment already processed by direct response, just log callback confirmation
+                        $this->order->add_order_note('TillPayments callback confirmation (already processed): ' . $callbackResult->getReferenceId(), false);
+                    }
                     break;
                 case \TillPayments\Client\Callback\Result::TYPE_VOID:
                     $this->order->update_status('cancelled', __('Void', 'woocommerce'));
