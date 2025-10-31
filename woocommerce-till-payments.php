@@ -62,8 +62,8 @@ add_action('plugins_loaded', function () {
         }
     });
 
-    add_action('wp_ajax_tillpayments_capture_payment', function () {
-        check_ajax_referer('tillpayments_capture_payment', 'security');
+    add_action('wp_ajax_tillpayments_capture_payment_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, function () {
+        check_ajax_referer('tillpayments_capture_payment_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'security');
 
         if (!current_user_can( 'edit_shop_orders')) {
             wp_die(-1);
