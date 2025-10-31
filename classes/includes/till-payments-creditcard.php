@@ -351,16 +351,16 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
                 return $this->paymentFailedResponse();
             } elseif ($result->getReturnType() == TillPayments\Client\Transaction\Result::RETURN_TYPE_REDIRECT) {
                 $this->log('  > return type: REDIRECT');
-                $this->order->add_meta_data('paymentUuid', $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 $this->log('  > redirect URL: '.$result->getRedirectUrl());
                 /**
                  * hosted payment page or seamless+3DS
                  */
-                
+
                 if ($transactionRequest === 'preauthorize') {
-                    $this->order->add_meta_data('pending_capture', 'yes', true);
+                    $this->order->add_meta_data('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'yes', true);
                     $this->order->save_meta_data();
                 }
                 return [
