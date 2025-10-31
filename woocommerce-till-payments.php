@@ -69,17 +69,6 @@ add_action('plugins_loaded', function () {
         return $content;
     }, 0, 1);
 
-    if (!function_exists('woocommerce_clear_cart_url')) {
-        add_action( 'init', 'woocommerce_clear_cart_url' );
-        function woocommerce_clear_cart_url() {
-            if (isset( $_GET['clear-cart']) && is_order_received_page()) {
-                global $woocommerce;
-
-                $woocommerce->cart->empty_cart();
-            }
-        }
-    }
-
     add_action('admin_enqueue_scripts', function($hook) {
         if ($hook === 'post.php') {
             wp_enqueue_script('tillpayments_capture_script_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, plugins_url("/tillpayments/assets/js/capture-payments.js"), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
