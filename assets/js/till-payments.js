@@ -168,7 +168,11 @@
 	            document.getElementById("loader").style.display = "none";
 	        };
 	        window.onload = function () {
-	            document.querySelector("iframe").addEventListener("load", removeLoader());
+	            // Safely check for iframe before attaching event listener
+	            var iframe = document.querySelector("iframe");
+	            if (iframe) {
+	                iframe.addEventListener("load", removeLoader);
+	            }
 	        }
 	        var submit = function (success, error) {
 	            var expiryData = $seamlessExpiryInput.val().split('/');
