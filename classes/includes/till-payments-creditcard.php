@@ -118,6 +118,28 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         var $errors = $('#till_payments_errors');
                         var $submitBtn = $("#place_order");
 
+                        // AUTO-FORMAT EXPIRY FIELD (MM/YY)
+                        if ($expiry.length) {
+                            $expiry.on('input', function() {
+                                var value = $(this).val().replace(/\D/g, ''); // Remove non-digits
+                                if (value.length >= 2) {
+                                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                                }
+                                $(this).val(value);
+                            });
+
+                            // Handle backspace to remove slash
+                            $expiry.on('keydown', function(e) {
+                                if (e.key === 'Backspace') {
+                                    var value = $(this).val();
+                                    if (value.length === 3 && value[2] === '/') {
+                                        $(this).val(value.substring(0, 2));
+                                        e.preventDefault();
+                                    }
+                                }
+                            });
+                        }
+
                         console.log('✓ Form elements found:', {
                             form: $form.length,
                             cardNumber: $cardNumber.length,
