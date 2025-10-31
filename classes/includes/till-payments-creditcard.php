@@ -954,7 +954,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         }
         </style>
         <div id="till_payments_errors"></div>
-        <div class="payment_box" style="padding: 25px; background-color: #fff; border-radius: 3px; max-width: 450px; min-height: 385px">
+        <div class="payment_box" style="padding: 25px; background-color: #fff; border-radius: 3px; max-width: 450px; min-height: 385px; display: block !important;">
             <div id = "loader"></div>
             <div id="till_payments_seamless">
                 <input type="hidden" id="till_payments_token" name="token">
