@@ -804,6 +804,24 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
+                // Save card if user requested it
+                if (is_user_logged_in() && !empty($_POST['till_payments_save_card'])) {
+                    $userId = get_current_user_id();
+                    $vaultToken = $result->getReferenceId();
+
+                    // Extract card details from order
+                    $cardDetails = [
+                        'last_4' => substr($this->get_post_data()['card_number'] ?? '', -4),
+                        'brand' => 'Credit Card',
+                        'expiry' => $this->get_post_data()['expiry'] ?? '',
+                    ];
+
+                    $savedCardId = $this->saveCardToken($userId, $vaultToken, $cardDetails);
+                    if ($savedCardId) {
+                        $this->order->add_order_note('Card saved for future purchases', false);
+                    }
+                }
+
                 switch ($transactionRequest) {
                     case 'preauthorize':
                         $this->order->add_order_note('TillPayments authorization ID: '.$result->getReferenceId(), false);
