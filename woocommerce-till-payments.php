@@ -25,6 +25,57 @@ define('TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_
 // Hard-coded integration key for this plugin instance
 define('TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY', 'exGKVg98OepQoyTzZTEz');
 
+/**
+ * Automatic Settings Migration
+ * When this plugin is activated, copy settings from the original Till Payments plugin
+ * This ensures the v1.10.5 plugin has its own independent copy of settings
+ */
+register_activation_hook(__FILE__, function() {
+    // Get settings from the original Till Payments plugin
+    $original_settings_key = 'woocommerce_till_payments_creditcard_settings';
+    $original_settings = get_option($original_settings_key, []);
+
+    // Settings to migrate
+    $settings_to_migrate = [
+        'title',
+        'apiHost',
+        'apiUser',
+        'apiPassword',
+        'apiKey',
+        'sharedSecret',
+        'transactionRequest'
+    ];
+
+    if (!empty($original_settings)) {
+        // Create v1.10.5 settings with migrated values
+        $v1_10_5_settings = [];
+        foreach ($settings_to_migrate as $setting_key) {
+            if (isset($original_settings[$setting_key])) {
+                $v1_10_5_settings[$setting_key] = $original_settings[$setting_key];
+            }
+        }
+
+        // Save to v1.10.5 gateway settings
+        if (!empty($v1_10_5_settings)) {
+            update_option('woocommerce_till_payments_v1_10_5_creditcard_settings', $v1_10_5_settings);
+
+            // Also migrate GooglePay and ApplePay settings if they exist
+            $googlepay_settings = get_option('woocommerce_till_payments_googlepay_settings', []);
+            if (!empty($googlepay_settings)) {
+                update_option('woocommerce_till_payments_v1_10_5_googlepay_settings', $googlepay_settings);
+            }
+
+            $applepay_settings = get_option('woocommerce_till_payments_applepay_settings', []);
+            if (!empty($applepay_settings)) {
+                update_option('woocommerce_till_payments_v1_10_5_applepay_settings', $applepay_settings);
+            }
+
+            // Mark migration as complete
+            update_option('till_payments_v1_10_5_settings_migrated', 'yes');
+        }
+    }
+});
+
 // Define global function at plugin load time (before plugins_loaded hook)
 if (!function_exists('woocommerce_clear_cart_url_v1_10_5')) {
     function woocommerce_clear_cart_url_v1_10_5() {
