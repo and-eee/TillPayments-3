@@ -841,6 +841,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     private function paymentFailedResponse()
     {
         $this->order->update_status('failed', __('Payment failed or was declined', 'woocommerce'));
+        $this->order->add_order_note('TillPayments payment failed or was declined', false);
+        $this->order->save();
         wc_add_notice(__('Payment failed or was declined', 'woocommerce'), 'error');
         return [
             'result' => 'error',
