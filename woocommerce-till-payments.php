@@ -92,7 +92,7 @@ add_action('plugins_loaded', function () {
         /**
          * gateway client
          */
-        WC_TillPayments_Provider::autoloadClient();
+        WC_TillPayments_V1_10_5_Provider::autoloadClient();
         TillPayments\Client\Client::setApiUrl($gateway->get_option('apiHost'));
         $client = new TillPayments\Client\Client(
             $gateway->get_option('apiUser'),
