@@ -639,8 +639,8 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('till_googlepay_js_' . $this->id);
-        wp_enqueue_script('till_googlepay_loader_js_' . $this->id);
+        wp_enqueue_script('till_googlepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
+        wp_enqueue_script('till_googlepay_loader_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
 
         $googlePayFrontendConfig = [
             'environment' => $this->get_option('environment'),
@@ -657,7 +657,7 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
             'grand_total' => WC()->cart->get_total(''),
         ];
 
-        wp_add_inline_script('till_googlepay_js_' . $this->id, 'window.googlePay = '.json_encode($googlePayFrontendConfig), 'before');
+        wp_add_inline_script('till_googlepay_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'window.googlePay = '.json_encode($googlePayFrontendConfig), 'before');
 
         echo '<style>
         #till_payments_googlepay_errors {color: red; }
