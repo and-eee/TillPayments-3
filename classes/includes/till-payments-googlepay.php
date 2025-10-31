@@ -65,15 +65,18 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
         add_action(
             'woocommerce_order_item_add_action_buttons',
             function(WC_Order $order) {
-                if ($order->get_meta('pending_capture') === 'yes' && $order->get_payment_method() === $this->id) {
+                if ($order->get_meta('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID) === 'yes' && $order->get_payment_method() === $this->id) {
                     echo sprintf(
-                        '<button 
-                            id="tillpayments_capture_payment" 
-                            type="button" 
-                            class="button capture-payment" 
+                        '<button
+                            id="tillpayments_capture_payment_%s"
+                            type="button"
+                            class="button capture-payment"
                             data-order-id="%s"
+                            data-version-id="%s"
                             data-payment-method="%s">Capture Payment</button>',
+                        esc_attr(TILL_PAYMENTS_EXTENSION_VERSION_ID),
                         esc_attr($order->get_id()),
+                        esc_attr(TILL_PAYMENTS_EXTENSION_VERSION_ID),
                         esc_attr($this->id)
                     );
                 }
