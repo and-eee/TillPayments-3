@@ -1056,6 +1056,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 case \TillPayments\Client\Callback\Result::TYPE_CAPTURE:
                     $this->order->payment_complete($callbackResult->getReferenceId());
                     $this->order->add_order_note('TillPayments callback processed: ' . $callbackResult->getReferenceId(), false);
+                    // Explicitly ensure status is set to processing
+                    $this->order->update_status('processing', 'Payment confirmed via callback');
                     break;
                 case \TillPayments\Client\Callback\Result::TYPE_VOID:
                     $this->order->update_status('cancelled', __('Void', 'woocommerce'));
