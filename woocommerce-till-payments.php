@@ -85,10 +85,7 @@ register_activation_hook(__FILE__, function() {
  * Deactivation hook - clean up when plugin is disabled
  */
 register_deactivation_hook(__FILE__, function() {
-    // Reset the flush flag so rewrite rules will be re-generated on reactivation
-    delete_option('till_payments_v1_10_5_rewrite_rules_flushed');
-
-    // Flush rewrite rules to remove the endpoint
+    // Flush rewrite rules to remove the custom endpoint
     flush_rewrite_rules();
 });
 
