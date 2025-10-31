@@ -157,6 +157,7 @@ add_action('woocommerce_account_till-payments-saved-cards_endpoint', function ()
 
 /**
  * Handle card deletion from My Account page
+ * SECURITY: Uses gateway's secure deleteSavedCard() method with HTTPS enforcement and audit logging
  */
 add_action('init', function () {
     if (is_user_logged_in() && !empty($_POST['delete_card_id'])) {
@@ -165,18 +166,30 @@ add_action('init', function () {
             wp_die('Security check failed');
         }
 
-        $userId = get_current_user_id();
-        $cardId = sanitize_text_field($_POST['delete_card_id']);
-        $savedCards = get_user_meta($userId, 'till_payments_v1_10_5_saved_cards', true);
-        $savedCards = is_array($savedCards) ? $savedCards : [];
+        try {
+            // Get the credit card gateway instance to use its secure deletion method
+            $gateways = WC()->payment_gateways()->payment_gateways();
+            $gateway = isset($gateways['till_payments_v1_10_5_creditcard']) ? $gateways['till_payments_v1_10_5_creditcard'] : null;
 
-        if (isset($savedCards[$cardId])) {
-            unset($savedCards[$cardId]);
-            update_user_meta($userId, 'till_payments_v1_10_5_saved_cards', $savedCards);
-            wc_add_notice('Card has been deleted successfully.', 'success');
-            wp_safe_remote_post(admin_url('admin-ajax.php')); // Redirect to same page
-            wp_redirect(wc_get_account_endpoint_url('till-payments-saved-cards'));
-            exit;
+            if (!$gateway) {
+                wc_add_notice('Payment gateway not available. Card deletion failed.', 'error');
+                return;
+            }
+
+            $cardId = sanitize_text_field($_POST['delete_card_id']);
+
+            // SECURITY: Call gateway's secure deletion method with HTTPS enforcement and audit logging
+            $deleted = $gateway->deleteSavedCard($cardId);
+
+            if ($deleted) {
+                wc_add_notice('Card has been deleted successfully.', 'success');
+                wp_redirect(wc_get_account_endpoint_url('till-payments-saved-cards'));
+                exit;
+            } else {
+                wc_add_notice('Card deletion failed. Card not found or security check failed.', 'error');
+            }
+        } catch (\Exception $e) {
+            wc_add_notice('Error deleting card: ' . esc_html($e->getMessage()), 'error');
         }
     }
 });
