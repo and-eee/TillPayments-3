@@ -262,18 +262,31 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
                             console.log('✓ Form ready for payment');
 
-                            // Monitor for form being hidden
-                            setInterval(function() {
+                            // AGGRESSIVE: Monitor for form being hidden and re-force visibility
+                            var reforceVisibility = setInterval(function() {
                                 var display = $form.css('display');
                                 var visibility = $form.css('visibility');
-                                if (display === 'none' || visibility === 'hidden') {
-                                    console.warn('✗ FORM WAS HIDDEN! display:', display, 'visibility:', visibility);
-                                    $form.show();
-                                    $form.css('display', 'block');
-                                    $form.css('visibility', 'visible');
-                                    console.log('✓ Re-showing form');
+                                var opacity = $form.css('opacity');
+
+                                if (display === 'none' || visibility === 'hidden' || opacity === '0') {
+                                    console.warn('✗ FORM WAS HIDDEN! Re-forcing visibility');
+                                    $form.css({
+                                        'display': 'block !important',
+                                        'visibility': 'visible !important',
+                                        'opacity': '1 !important'
+                                    });
+                                    $paymentBox.css({
+                                        'display': 'block !important',
+                                        'visibility': 'visible !important',
+                                        'opacity': '1 !important'
+                                    });
+                                    $li.css({
+                                        'display': 'block !important',
+                                        'visibility': 'visible !important',
+                                        'opacity': '1 !important'
+                                    });
                                 }
-                            }, 100);
+                            }, 50);
                         });
                     };
                 };
