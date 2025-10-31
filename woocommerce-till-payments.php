@@ -77,11 +77,33 @@ register_activation_hook(__FILE__, function() {
         }
     }
 
-    // IMPORTANT: Flush rewrite rules so WordPress recognizes the saved cards endpoint
-    // The endpoint is registered with add_rewrite_endpoint() below, but it won't work
-    // until rewrite rules are flushed
+    // IMPORTANT: Schedule rewrite rules flush for after plugin loading completes
+    // The endpoint won't be registered yet (it's in plugins_loaded hook),
+    // so we schedule this to run after WordPress is fully initialized
+    wp_schedule_single_event(time(), 'till_payments_v1_10_5_flush_rewrite_rules');
+});
+
+/**
+ * Flush rewrite rules after plugin is fully loaded
+ * This happens after the endpoint registration in plugins_loaded hook
+ */
+add_action('till_payments_v1_10_5_flush_rewrite_rules', function () {
     flush_rewrite_rules();
 });
+
+/**
+ * Also flush rewrite rules in plugins_loaded hook to handle fresh installs
+ */
+add_action('plugins_loaded', function () {
+    // Check if we need to flush rules (first time setup)
+    $flushed = get_option('till_payments_v1_10_5_rewrite_rules_flushed');
+    if (!$flushed) {
+        // Mark that we've flushed, then do the flush
+        update_option('till_payments_v1_10_5_rewrite_rules_flushed', 'yes');
+        // Use a small delay to ensure endpoint is registered first
+        wp_schedule_single_event(time() + 1, 'till_payments_v1_10_5_flush_rewrite_rules');
+    }
+}, 2); // Priority 2 = after the endpoint registration (priority 1)
 
 // Define global function at plugin load time (before plugins_loaded hook)
 if (!function_exists('woocommerce_clear_cart_url_v1_10_5')) {
