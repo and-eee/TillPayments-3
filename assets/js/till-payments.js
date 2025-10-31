@@ -1,5 +1,6 @@
 (function ($) {
-	$(document).ready(function(){
+	// Initialize immediately OR wait for ready (in case document isn't ready yet)
+	var initTillPayments = function() {
 		console.log('✓ Document ready - Till Payments init starting');
 
 		var $paymentForm = $('#till_payments_seamless').closest('form');
