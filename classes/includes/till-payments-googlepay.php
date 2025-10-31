@@ -265,7 +265,7 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
                 return $this->paymentFailedResponse();
             } elseif ($result->getReturnType() == TransactionResult::RETURN_TYPE_REDIRECT) {
                 $this->log('  > return type: REDIRECT');
-                $this->order->add_meta_data('paymentUuid', $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 $this->log('  > redirect URL: '.$result->getRedirectUrl());
@@ -283,7 +283,7 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
                  * payment is pending, wait for callback to complete
                  */
             } elseif ($result->getReturnType() == TransactionResult::RETURN_TYPE_FINISHED) {
-                $this->order->add_meta_data('paymentUuid', $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 switch ($transactionRequest) {
