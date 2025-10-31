@@ -1149,7 +1149,16 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         break;
                 }
 
-                $this->order->save();
+                // Save all metadata and order changes
+                try {
+                    if (method_exists($this->order, 'save_meta_data')) {
+                        $this->order->save_meta_data();
+                    }
+                    $this->order->save();
+                } catch (\Exception $e) {
+                    $this->log('Error saving order after payment: ' . $e->getMessage(), WC_Log_Levels::ERROR);
+                }
+
                 $this->log('  > return type: FINISHED');
                 $this->log('  > result data: '.print_r($result->toArray(), true));
             }
