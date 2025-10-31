@@ -946,7 +946,7 @@ if (!class_exists('WC_TillPayments_ApplePay')) {
         return true;
     }
 
-    /** 
+    /**
      * add payment description
     */
     public function updateDescription($id)
@@ -954,5 +954,6 @@ if (!class_exists('WC_TillPayments_ApplePay')) {
         if ($id == $this->id){
             echo '<div style = "margin-left: 30px; padding: 5px;">You will be able to confirm your payment via the Apple Pay payment sheet. Powered by <a href="https://tillpayments.com/">Till Payments</a></div>';
         }
+    }
     }
 }
