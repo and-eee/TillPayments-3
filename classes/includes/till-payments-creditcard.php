@@ -498,11 +498,27 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                 }
                             }, 50);
 
+                            // HELPER: Scroll to error message so it's in focus
+                            var scrollToError = function() {
+                                // Try to scroll to payment form errors first
+                                var $errorElement = $errors.length > 0 ? $errors : $form;
+                                if ($errorElement.length > 0) {
+                                    $('html, body').animate({
+                                        scrollTop: $errorElement.offset().top - 100
+                                    }, 600, function() {
+                                        console.log('✓ Scrolled to error message');
+                                    });
+                                }
+                            };
+
                             // SAFETY: Hide loader if WooCommerce checkout validation fails
                             // This handles cases where required fields are missing, etc.
                             $(document).on('checkout_error', function() {
                                 console.log('✓ Checkout validation error detected, hiding loader');
                                 $('#till-payments-processing-overlay').removeClass('active');
+                                setTimeout(function() {
+                                    scrollToError();
+                                }, 300);
                             });
 
                             // SAFETY: Track loader visibility and auto-hide after 60 seconds
@@ -520,6 +536,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                         console.warn('✗ Loader visible for 60+ seconds, auto-hiding as safety measure');
                                         $('#till-payments-processing-overlay').removeClass('active');
                                         wc_add_notice('Payment processing timed out. Please try again.', 'error');
+                                        setTimeout(function() {
+                                            scrollToError();
+                                        }, 300);
                                     }
                                 }, 60000);
                             });
@@ -531,6 +550,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                     clearTimeout(loaderTimeout);
                                 }
                                 $('#till-payments-processing-overlay').removeClass('active');
+                                setTimeout(function() {
+                                    scrollToError();
+                                }, 300);
                             });
                         });
                     };
