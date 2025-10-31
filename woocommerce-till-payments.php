@@ -13,32 +13,17 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-if (!defined('TILL_PAYMENTS_EXTENSION_URL')) {
-    define('TILL_PAYMENTS_EXTENSION_URL', 'https://gateway.tillpayments.com/');
-}
-if (!defined('TILL_PAYMENTS_EXTENSION_URL_TEST')) {
-    define('TILL_PAYMENTS_EXTENSION_URL_TEST', 'https://test-gateway.tillpayments.com/');
-}
-if (!defined('TILL_PAYMENTS_EXTENSION_NAME')) {
-    define('TILL_PAYMENTS_EXTENSION_NAME', 'Till Payments');
-}
-if (!defined('TILL_PAYMENTS_EXTENSION_VERSION')) {
-    define('TILL_PAYMENTS_EXTENSION_VERSION', '1.10.5');
-}
-if (!defined('TILL_PAYMENTS_EXTENSION_UID_PREFIX')) {
-    define('TILL_PAYMENTS_EXTENSION_UID_PREFIX', 'till_payments_');
-}
-if (!defined('TILL_PAYMENTS_EXTENSION_BASEDIR')) {
-    define('TILL_PAYMENTS_EXTENSION_BASEDIR', plugin_dir_path(__FILE__));
-}
-if (!defined('TILL_PAYMENTS_EXTENSION_VERSION_ID')) {
-    define('TILL_PAYMENTS_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_PAYMENTS_EXTENSION_VERSION));
-}
+// This is the v1.10.5 instance - all constants namespaced with V1_10_5 prefix to avoid conflicts
+define('TILL_PAYMENTS_V1_10_5_EXTENSION_URL', 'https://gateway.tillpayments.com/');
+define('TILL_PAYMENTS_V1_10_5_EXTENSION_URL_TEST', 'https://test-gateway.tillpayments.com/');
+define('TILL_PAYMENTS_V1_10_5_EXTENSION_NAME', 'Till Payments v1.10.5');
+define('TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION', '1.10.5');
+define('TILL_PAYMENTS_V1_10_5_EXTENSION_UID_PREFIX', 'till_payments_v1_10_5_');
+define('TILL_PAYMENTS_V1_10_5_EXTENSION_BASEDIR', plugin_dir_path(__FILE__));
+define('TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION));
 
 // Hard-coded integration key for this plugin instance
-if (!defined('TILL_PAYMENTS_INTEGRATION_KEY')) {
-    define('TILL_PAYMENTS_INTEGRATION_KEY', 'exGKVg98OepQoyTzZTEz');
-}
+define('TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY', 'exGKVg98OepQoyTzZTEz');
 
 // Define global function at plugin load time (before plugins_loaded hook)
 if (!function_exists('woocommerce_clear_cart_url')) {
