@@ -301,6 +301,13 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                 e.preventDefault();
                                 console.log('Processing payment...');
 
+                                // Show loader, message, and overlay
+                                $('#loader').show();
+                                $('#till_payments_processing_message').html('Please don\'t close or refresh this page while we process your payment').show();
+                                $('#till_payments_overlay').show();
+                                // Clear any previous error messages
+                                $errors.html('');
+
                                 var expiryData = $expiry.val().split('/');
                                 payment.tokenize({
                                     card_holder: $cardHolder.val(),
