@@ -1639,17 +1639,36 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             </p>
             <div style="clear: both;"></div>';
 
-        // Show save card checkbox for logged-in users
+        // Show save card section for logged-in users
         if (is_user_logged_in()) {
-            echo '<p class="form-row form-row-wide" style="margin-top: 15px;">
-                <input type="checkbox" id="till_payments_save_card" name="till_payments_save_card" value="yes" style="width: auto; margin-right: 8px;">
-                <label for="till_payments_save_card" style="display: inline; font-weight: normal;">Save this card for future purchases</label>
-                <!-- Hidden fields for card details -->
-                <input type="hidden" id="till_payments_card_last_4" name="till_payments_card_last_4" value="">
-                <input type="hidden" id="till_payments_card_brand" name="till_payments_card_brand" value="">
-                <input type="hidden" id="till_payments_card_expiry" name="till_payments_card_expiry" value="">
-                <input type="hidden" id="till_payments_card_nickname" name="till_payments_card_nickname" value="">
-            </p>';
+            echo '<div id="till-payments-save-card-section" style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px; display: none;">
+                <p class="form-row form-row-wide">
+                    <input type="checkbox" id="till_payments_save_card" name="till_payments_save_card" value="yes" style="width: auto; margin-right: 8px;">
+                    <label for="till_payments_save_card" style="display: inline; font-weight: bold;">Save this card for future purchases</label>
+                </p>
+
+                <div id="till-payments-save-card-fields" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                    <p class="form-row form-row-first" style="width: 48%; float: left; margin-right: 2%;">
+                        <label for="till_payments_card_last_4" style="display: block; font-weight: bold; margin-bottom: 5px;">Last 4 Digits *</label>
+                        <input type="text" id="till_payments_card_last_4" name="till_payments_card_last_4" placeholder="e.g., 1234" maxlength="4" inputmode="numeric" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;">
+                    </p>
+
+                    <p class="form-row form-row-last" style="width: 50%; float: left;">
+                        <label for="till_payments_card_nickname" style="display: block; font-weight: bold; margin-bottom: 5px;">Card Name (optional)</label>
+                        <input type="text" id="till_payments_card_nickname" name="till_payments_card_nickname" placeholder="e.g., My Visa" maxlength="50" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;">
+                    </p>
+
+                    <div style="clear: both;"></div>
+
+                    <!-- Hidden fields for brand and expiry captured from form -->
+                    <input type="hidden" id="till_payments_card_brand" name="till_payments_card_brand" value="">
+                    <input type="hidden" id="till_payments_card_expiry" name="till_payments_card_expiry" value="">
+
+                    <p style="font-size: 12px; color: #666; margin-top: 10px; font-style: italic;">
+                        The expiry date will be captured automatically from the form above.
+                    </p>
+                </div>
+            </div>';
         }
 
         echo '</div>'; // Close new card form div
