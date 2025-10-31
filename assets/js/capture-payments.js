@@ -2,7 +2,7 @@
     'use strict';
 
     $(function() {
-        $('#woocommerce-order-items').on('click','#tillpayments_capture_payment', function () {
+        $('#woocommerce-order-items').on('click','[id^="tillpayments_capture_payment_"]', function () {
             if (!confirm('Do you want to capture the authorized payment via TillPayments gateway?')) {
                 return;
             }
@@ -10,17 +10,18 @@
             // get the order_id from the button tag
             var order_id = $(this).data('order-id');
             var payment_method = $(this).data('payment-method');
+            var versionId = $(this).data('version-id');
 
-            // send the data via ajax to the sever
+            // send the data via ajax to the server
             $.ajax({
                 type: 'POST',
                 url: ajaxurl,
                 dataType: 'json',
                 data: {
-                    action: 'tillpayments_capture_payment',
+                    action: 'tillpayments_capture_payment_' + versionId,
                     order_id: order_id,
                     payment_method: payment_method,
-                    security: tp_capture.security,
+                    security: window['tp_capture_' + versionId].security,
                 },
                 success: function (data) {
                     if (data.error === 0) {
