@@ -468,7 +468,7 @@ if (!class_exists('WC_TillPayments_GooglePay')) {
         $this->order = new WC_Order($this->decodeOrderId($callbackResult->getTransactionId()));
 
         // check if callback data is coming from the last (=newest+relevant) tx attempt, otherwise ignore it
-        if ($this->order->get_meta('orderTxId') !== $callbackResult->getTransactionId()) {
+        if ($this->order->get_meta('orderTxId_' . TILL_PAYMENTS_EXTENSION_VERSION_ID) !== $callbackResult->getTransactionId()) {
             die("OK");
         }
         
