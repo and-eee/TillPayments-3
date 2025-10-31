@@ -26,14 +26,14 @@ define('TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_
 define('TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY', 'exGKVg98OepQoyTzZTEz');
 
 // Define global function at plugin load time (before plugins_loaded hook)
-if (!function_exists('woocommerce_clear_cart_url')) {
-    function woocommerce_clear_cart_url() {
+if (!function_exists('woocommerce_clear_cart_url_v1_10_5')) {
+    function woocommerce_clear_cart_url_v1_10_5() {
         if (isset($_GET['clear-cart']) && is_order_received_page()) {
             global $woocommerce;
             $woocommerce->cart->empty_cart();
         }
     }
-    add_action('init', 'woocommerce_clear_cart_url');
+    add_action('init', 'woocommerce_clear_cart_url_v1_10_5');
 }
 
 add_action('plugins_loaded', function () {
