@@ -57,8 +57,8 @@ add_action('plugins_loaded', function () {
 
     add_action('admin_enqueue_scripts', function($hook) {
         if ($hook === 'post.php') {
-            wp_enqueue_script('tillpayments_capture_script', plugins_url("/tillpayments/assets/js/capture-payments.js"), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
-            wp_localize_script('tillpayments_capture_script', 'tp_capture', ['security' => wp_create_nonce('tillpayments_capture_payment')]);
+            wp_enqueue_script('tillpayments_capture_script_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, plugins_url("/tillpayments/assets/js/capture-payments.js"), ['jquery'], TILL_PAYMENTS_EXTENSION_VERSION, false);
+            wp_localize_script('tillpayments_capture_script_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'tp_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, ['security' => wp_create_nonce('tillpayments_capture_payment_' . TILL_PAYMENTS_EXTENSION_VERSION_ID)]);
         }
     });
 
