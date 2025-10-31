@@ -104,6 +104,22 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         $this->logger->log($level, $msg, $context);
     }
 
+    /**
+     * Override get_option to read from the original gateway's settings
+     * This allows both plugins to share the same configuration
+     */
+    public function get_option($key, $empty_value = null)
+    {
+        // Get settings from the original gateway ID instead of this namespaced version
+        $option_key = 'woocommerce_' . $this->original_gateway_id . '_settings';
+        $all_settings = get_option($option_key);
+
+        if (is_array($all_settings) && isset($all_settings[$key])) {
+            return $all_settings[$key];
+        }
+
+        return $empty_value;
+    }
 
     public function hide_payment_gateways_on_pay_for_order_page($available_gateways)
     {
