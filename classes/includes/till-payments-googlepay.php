@@ -707,7 +707,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_GooglePay')) {
         echo '<style>
         #till_payments_googlepay_errors {color: red; }
         #googlepay-button { height: 65px; }
-        #payment .payment_methods li .payment_box.payment_method_till_payments_googlepay { padding: 0; } 
+        #payment .payment_methods li .payment_box[class*="payment_method_"][class*="till_payments"][class*="googlepay"] { padding: 0; }
         </style>
         <div id="till_payments_googlepay_errors"></div>
         <div id="till_payments_googlepay">
