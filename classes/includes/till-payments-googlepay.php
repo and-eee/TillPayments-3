@@ -690,9 +690,6 @@ if (!class_exists('WC_TillPayments_V1_10_5_GooglePay')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('till_googlepay_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
-        wp_enqueue_script('till_googlepay_loader_js_' . $this->id . '_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
-
         $googlePayFrontendConfig = [
             'environment' => $this->get_option('environment'),
             'button_type' => $this->get_option('button_type'),
