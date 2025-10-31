@@ -984,8 +984,29 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                     if (TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY) {
                         $transaction->setTransactionToken($vaultToken);
                         $savedCardUsed = true;
+
+                        // SECURITY: Audit logging - saved card used
+                        $this->log(
+                            sprintf(
+                                'AUDIT: Saved card used | User: %d | Order: %d | Card: %s | Brand: %s | Last 4: %s',
+                                $userId,
+                                $orderId,
+                                $cardSelection,
+                                $savedCard['brand'],
+                                $savedCard['last_4']
+                            ),
+                            WC_Log_Levels::INFO,
+                            'CardOperations'
+                        );
                         $this->log('  > Using saved card: ' . $cardSelection);
                     }
+                } else {
+                    // SECURITY: Log attempted use of non-existent saved card
+                    $this->log(
+                        sprintf('SECURITY: Attempted to use non-existent saved card | User: %d | Card ID: %s', $userId, $cardSelection),
+                        WC_Log_Levels::WARNING,
+                        'CardOperations'
+                    );
                 }
             }
         }
