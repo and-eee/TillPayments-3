@@ -2,10 +2,10 @@
 
 use TillPayments\Client\Transaction\Refund;
 
-if (!class_exists('WC_TillPayments_CreditCard')) {
-    class WC_TillPayments_CreditCard extends WC_Payment_Gateway
+if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
+    class WC_TillPayments_V1_10_5_CreditCard extends WC_Payment_Gateway
     {
-    public $id = 'creditcard';
+    public $id = 'creditcard_v1_10_5';
 
     public $method_title = 'Credit Card';
 
