@@ -683,11 +683,26 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     /**
      * Save a vault token securely for a user (only for logged-in users)
-     * Stores: vault token, last 4 digits, card brand, expiry date
+     * SECURITY: Encrypts tokens at rest, enforces HTTPS, logs all operations
+     * Stores: encrypted vault token, last 4 digits, card brand, expiry date
+     *
+     * @param int $userId User ID
+     * @param string $vaultToken Vault token from Till Payments
+     * @param array $cardDetails Card metadata (last_4, brand, expiry)
+     * @return string|false Card ID if saved, false otherwise
      */
     private function saveCardToken($userId, $vaultToken, $cardDetails = [])
     {
+        // SECURITY: Enforce HTTPS for card operations
+        try {
+            $this->enforceHttps();
+        } catch (\Exception $e) {
+            $this->log('HTTPS enforcement failed during card save: ' . $e->getMessage(), WC_Log_Levels::ERROR, 'CardSecurity');
+            return false;
+        }
+
         if (!$userId || !is_user_logged_in()) {
+            $this->log('Card save attempt without valid user session', WC_Log_Levels::WARNING, 'CardSecurity');
             return false;
         }
 
@@ -697,12 +712,13 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             $savedCards = [];
         }
 
-        // Create card record with hashed token for security
+        // Create card record with encrypted token for security
         $cardId = wp_generate_password(16, false);
+        $encryptedToken = $this->encryptToken($vaultToken);
+
         $savedCards[$cardId] = [
-            'token' => wp_hash_password($vaultToken), // Hash the token
-            'token_plain' => $vaultToken, // Store plain for now (consider encryption in production)
-            'last_4' => isset($cardDetails['last_4']) ? sanitize_text_field($cardDetails['last_4']) : '****',
+            'token_encrypted' => $encryptedToken, // SECURITY: Encrypted vault token
+            'last_4' => isset($cardDetails['last_4']) ? sanitize_text_field($cardDetails['last_4']) : 'XXXX',
             'brand' => isset($cardDetails['brand']) ? sanitize_text_field($cardDetails['brand']) : 'Card',
             'expiry' => isset($cardDetails['expiry']) ? sanitize_text_field($cardDetails['expiry']) : '',
             'saved_date' => current_time('mysql'),
@@ -710,7 +726,20 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
         // Save updated cards
         update_user_meta($userId, 'till_payments_v1_10_5_saved_cards', $savedCards);
-        $this->log('Card token saved for user ' . $userId . ': ' . $cardId);
+
+        // SECURITY: Audit logging - card save operation
+        $this->log(
+            sprintf(
+                'AUDIT: Card saved for user %d | Card ID: %s | Brand: %s | Last 4: %s | Expiry: %s',
+                $userId,
+                $cardId,
+                $savedCards[$cardId]['brand'],
+                $savedCards[$cardId]['last_4'],
+                $savedCards[$cardId]['expiry']
+            ),
+            WC_Log_Levels::INFO,
+            'CardOperations'
+        );
 
         return $cardId;
     }
