@@ -812,22 +812,56 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     /**
      * Delete a saved card for a user
+     * SECURITY: Enforces HTTPS, validates user ownership, logs deletion
+     *
+     * @param string $cardId Card ID to delete
+     * @return bool True if deleted, false otherwise
      */
     public function deleteSavedCard($cardId)
     {
+        // SECURITY: Enforce HTTPS for card operations
+        try {
+            $this->enforceHttps();
+        } catch (\Exception $e) {
+            $this->log('HTTPS enforcement failed during card deletion: ' . $e->getMessage(), WC_Log_Levels::ERROR, 'CardSecurity');
+            return false;
+        }
+
         $userId = get_current_user_id();
         if (!$userId) {
+            $this->log('Card deletion attempt without valid user session', WC_Log_Levels::WARNING, 'CardSecurity');
             return false;
         }
 
         $savedCards = $this->getSavedCards($userId);
         if (isset($savedCards[$cardId])) {
+            $cardBrand = $savedCards[$cardId]['brand'] ?? 'Unknown';
+            $cardLast4 = $savedCards[$cardId]['last_4'] ?? 'XXXX';
+
             unset($savedCards[$cardId]);
             update_user_meta($userId, 'till_payments_v1_10_5_saved_cards', $savedCards);
-            $this->log('Saved card deleted: ' . $cardId . ' for user ' . $userId);
+
+            // SECURITY: Audit logging - card deletion
+            $this->log(
+                sprintf(
+                    'AUDIT: Card deleted | User: %d | Card ID: %s | Brand: %s | Last 4: %s',
+                    $userId,
+                    $cardId,
+                    $cardBrand,
+                    $cardLast4
+                ),
+                WC_Log_Levels::INFO,
+                'CardOperations'
+            );
+
             return true;
         }
 
+        $this->log(
+            sprintf('AUDIT: Card deletion failed - card not found | User: %d | Card ID: %s', $userId, $cardId),
+            WC_Log_Levels::WARNING,
+            'CardOperations'
+        );
         return false;
     }
 
