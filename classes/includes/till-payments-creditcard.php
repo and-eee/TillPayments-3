@@ -1069,8 +1069,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 case \TillPayments\Client\Callback\Result::TYPE_DEBIT:
                 case \TillPayments\Client\Callback\Result::TYPE_CAPTURE:
                 case \TillPayments\Client\Callback\Result::TYPE_VOID:
-                    $this->order->update_status('failed', __('Error', 'woocommerce'));
-                    $this->order->add_order_note('TillPayments callback error: Payment processing failed', false);
+                    $this->order->add_order_note(__('Error during payment process', 'woocommerce'));
+                    // Send failed order email notification
+                    WC()->mailer()->get_emails()['WC_Email_Failed_Order']->trigger($this->order->get_id());
                     break;
             }
         }
