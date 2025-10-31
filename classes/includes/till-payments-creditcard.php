@@ -412,21 +412,45 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     }
 
     /**
-     * Override process_admin_options to prevent saving all settings
-     * Only allow the 'enabled' toggle to save to our settings
+     * Override process_admin_options to save all settings to the v1.10.5 gateway
+     * This makes the v1.10.5 plugin fully independent from the original
      */
     public function process_admin_options()
     {
-        // Only save the 'enabled' setting to our own gateway settings
+        // Get current v1.10.5 settings
+        $v1_10_5_option_key = 'woocommerce_' . $this->id . '_settings';
+        $settings = get_option($v1_10_5_option_key, []);
+
+        // Settings to save
+        $settings_to_save = [
+            'title',
+            'apiHost',
+            'apiUser',
+            'apiPassword',
+            'apiKey',
+            'sharedSecret',
+            'transactionRequest'
+        ];
+
+        // Update settings from POST data
+        foreach ($settings_to_save as $setting_key) {
+            $post_key = 'woocommerce_' . $this->id . '_' . $setting_key;
+            if (isset($_POST[$post_key])) {
+                $settings[$setting_key] = sanitize_text_field($_POST[$post_key]);
+            }
+        }
+
+        // Save all settings to v1.10.5 gateway
+        update_option($v1_10_5_option_key, $settings);
+
+        // Handle enabled/disabled toggle
         if (isset($_POST['woocommerce_' . $this->id . '_enabled'])) {
             update_option('woocommerce_' . $this->id . '_enabled', 'yes');
         } else {
             update_option('woocommerce_' . $this->id . '_enabled', 'no');
         }
 
-        // Don't call parent to prevent saving other settings
-        // Instead show a message that settings are managed by the original plugin
-        WC_Admin_Settings::add_message(__('Settings are managed by the original Till Payments plugin. Enable/disable status saved.', 'woocommerce'));
+        WC_Admin_Settings::add_message(__('Settings saved successfully.', 'woocommerce'));
 
         return false;
     }
