@@ -106,7 +106,12 @@ if (!class_exists('WC_TillPayments_V1_10_5_GooglePay')) {
      */
     public function get_option($key, $empty_value = null)
     {
-        // Get settings from the original gateway ID instead of this namespaced version
+        // Special handling for 'enabled' - read from our own settings so enable/disable works
+        if ($key === 'enabled') {
+            return parent::get_option($key, $empty_value);
+        }
+
+        // Get all other settings from the original gateway ID
         $option_key = 'woocommerce_' . $this->original_gateway_id . '_settings';
         $all_settings = get_option($option_key);
 
@@ -115,6 +120,26 @@ if (!class_exists('WC_TillPayments_V1_10_5_GooglePay')) {
         }
 
         return $empty_value;
+    }
+
+    /**
+     * Override process_admin_options to prevent saving all settings
+     * Only allow the 'enabled' toggle to save to our settings
+     */
+    public function process_admin_options()
+    {
+        // Only save the 'enabled' setting to our own gateway settings
+        if (isset($_POST['woocommerce_' . $this->id . '_enabled'])) {
+            update_option('woocommerce_' . $this->id . '_enabled', 'yes');
+        } else {
+            update_option('woocommerce_' . $this->id . '_enabled', 'no');
+        }
+
+        // Don't call parent to prevent saving other settings
+        // Instead show a message that settings are managed by the original plugin
+        WC_Admin_Settings::add_message(__('Settings are managed by the original Till Payments plugin. Enable/disable status saved.', 'woocommerce'));
+
+        return false;
     }
 
     public function hide_payment_gateways_on_pay_for_order_page($available_gateways)
