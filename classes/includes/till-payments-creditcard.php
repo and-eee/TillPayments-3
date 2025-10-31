@@ -68,7 +68,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             add_action(
                 'woocommerce_order_item_add_action_buttons',
                 function(WC_Order $order) {
-                    if ($order->get_meta('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID) === 'yes' && $order->get_payment_method() === $this->id) {
+                    if ($order->get_meta('pending_capture_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID) === 'yes' && $order->get_payment_method() === $this->id) {
                         echo sprintf(
                             '<button
                             id="tillpayments_capture_payment_%s"
@@ -77,9 +77,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                             data-order-id="%s"
                             data-version-id="%s"
                             data-payment-method="%s">Capture Payment</button>',
-                            esc_attr(TILL_PAYMENTS_EXTENSION_VERSION_ID),
+                            esc_attr(TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID),
                             esc_attr($order->get_id()),
-                            esc_attr(TILL_PAYMENTS_EXTENSION_VERSION_ID),
+                            esc_attr(TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID),
                             esc_attr($this->id)
                             );
                     }
