@@ -90,8 +90,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                     var $ = jQuery;
                     console.log('✓ Till Payments init function executing');
 
-                    // Check for integration key
-                    var integrationKey = window.integrationKey_<?php echo TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID; ?>;
+                    // Set and check integration key directly
+                    var integrationKey = '<?php echo TILL_PAYMENTS_V1_10_5_INTEGRATION_KEY; ?>';
                     console.log('✓ Integration key:', integrationKey ? 'FOUND' : 'MISSING');
 
                     // Wait for PaymentJs library
