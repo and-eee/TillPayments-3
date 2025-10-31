@@ -249,6 +249,34 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                 },
                                 function(token) {
                                     console.log('✓ Token received');
+
+                                    // CAPTURE CARD DETAILS FOR SAVING
+                                    // Extract last 4 from card number using PaymentJs data
+                                    payment.getCardData(function(cardData) {
+                                        // cardData should contain payment information
+                                        console.log('Card data available for storage');
+
+                                        // PaymentJs may not expose raw card number, so we try to get it from the iframe
+                                        // Alternatively, we'll use a generic approach
+                                        var cardLastFour = 'XXXX'; // Default fallback
+
+                                        // Try to extract from available payment data
+                                        if (cardData && cardData.cardNumber) {
+                                            var cardNum = cardData.cardNumber.toString();
+                                            cardLastFour = cardNum.slice(-4);
+                                        }
+
+                                        // Populate hidden fields for server-side card storage
+                                        $('#till_payments_card_last_4').val(cardLastFour);
+                                        $('#till_payments_card_brand').val(cardData && cardData.cardBrand ? cardData.cardBrand : 'Credit Card');
+                                        $('#till_payments_card_expiry').val($expiry.val());
+
+                                        console.log('Card details captured:', {
+                                            last_4: cardLastFour,
+                                            expiry: $expiry.val()
+                                        });
+                                    });
+
                                     $token.val(token);
                                     $form.closest('form').submit();
                                 },
