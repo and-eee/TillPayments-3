@@ -105,7 +105,7 @@ add_action('plugins_loaded', function () {
         $transaction->setTransactionId($captureTxId)
             ->setAmount(floatval($order->get_total('')))
             ->setCurrency($order->get_currency())
-            ->setReferenceTransactionId($order->get_meta('paymentUuid'));
+            ->setReferenceTransactionId($order->get_meta('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID));
 
         /**
          * transaction
