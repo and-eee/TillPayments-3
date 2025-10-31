@@ -381,8 +381,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     }
 
     /**
-     * Override get_option to read from the original gateway's settings
-     * This allows both plugins to share the same configuration
+     * Override get_option to read from the v1.10.5 settings if they exist,
+     * otherwise fall back to the original gateway's settings for backwards compatibility
      */
     public function get_option($key, $empty_value = null)
     {
@@ -391,12 +391,21 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             return parent::get_option($key, $empty_value);
         }
 
-        // Get all other settings from the original gateway ID
-        $option_key = 'woocommerce_' . $this->original_gateway_id . '_settings';
-        $all_settings = get_option($option_key);
+        // First, try to read from v1.10.5 settings (after migration)
+        $v1_10_5_option_key = 'woocommerce_' . $this->id . '_settings';
+        $v1_10_5_settings = get_option($v1_10_5_option_key);
 
-        if (is_array($all_settings) && isset($all_settings[$key])) {
-            return $all_settings[$key];
+        if (is_array($v1_10_5_settings) && isset($v1_10_5_settings[$key])) {
+            return $v1_10_5_settings[$key];
+        }
+
+        // Fall back to original gateway settings for backwards compatibility
+        // (if migration hasn't happened yet or original plugin is still active)
+        $original_option_key = 'woocommerce_' . $this->original_gateway_id . '_settings';
+        $original_settings = get_option($original_option_key);
+
+        if (is_array($original_settings) && isset($original_settings[$key])) {
+            return $original_settings[$key];
         }
 
         return $empty_value;
