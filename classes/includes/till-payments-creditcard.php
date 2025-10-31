@@ -1285,9 +1285,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
             /**
              * 3DS Secure - DISABLED
-             * Previously set to 'mandatory' but disabled per user request
              */
-            // '3dsecure' => 'mandatory',
+            '3dsecure' => 'off',
 
             /**
              * Additional 3ds 2.0 data
