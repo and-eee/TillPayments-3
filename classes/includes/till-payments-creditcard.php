@@ -1640,15 +1640,158 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             echo '<p class="form-row form-row-wide" style="margin-top: 15px;">
                 <input type="checkbox" id="till_payments_save_card" name="till_payments_save_card" value="yes" style="width: auto; margin-right: 8px;">
                 <label for="till_payments_save_card" style="display: inline; font-weight: normal;">Save this card for future purchases</label>
-                <!-- Hidden fields for card details captured by PaymentJs -->
+                <!-- Hidden fields for card details -->
                 <input type="hidden" id="till_payments_card_last_4" name="till_payments_card_last_4" value="">
                 <input type="hidden" id="till_payments_card_brand" name="till_payments_card_brand" value="">
                 <input type="hidden" id="till_payments_card_expiry" name="till_payments_card_expiry" value="">
+                <input type="hidden" id="till_payments_card_nickname" name="till_payments_card_nickname" value="">
             </p>';
         }
 
         echo '</div>'; // Close new card form div
         echo '</div>'; // Close payment_box div
+
+        // Add modal for card nickname
+        if (is_user_logged_in()) {
+            echo '
+            <style>
+            .till-payments-modal {
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .till-payments-modal-content {
+                background-color: #fff;
+                margin: auto;
+                padding: 30px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                width: 90%;
+                max-width: 400px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            }
+
+            .till-payments-modal-content h3 {
+                margin-top: 0;
+                margin-bottom: 15px;
+                font-size: 18px;
+            }
+
+            .till-payments-modal-content p {
+                margin-bottom: 15px;
+                font-size: 14px;
+                color: #666;
+            }
+
+            .till-payments-modal-content input {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 14px;
+            }
+
+            .till-payments-modal-buttons {
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+            }
+
+            .till-payments-modal-buttons button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+            .till-payments-modal-buttons .btn-save {
+                background-color: #5e72e4;
+                color: white;
+            }
+
+            .till-payments-modal-buttons .btn-save:hover {
+                background-color: #4c63d2;
+            }
+
+            .till-payments-modal-buttons .btn-cancel {
+                background-color: #e3e6f0;
+                color: #333;
+            }
+
+            .till-payments-modal-buttons .btn-cancel:hover {
+                background-color: #d0d5e8;
+            }
+            </style>
+
+            <!-- Card Nickname Modal -->
+            <div id="till-payments-nickname-modal" class="till-payments-modal">
+                <div class="till-payments-modal-content">
+                    <h3>Save Card</h3>
+                    <p id="card-info-display" style="font-weight: bold; margin-bottom: 20px;">Card details will appear here</p>
+                    <label for="card-nickname" style="display: block; margin-bottom: 8px; font-weight: bold;">Give this card a name (optional)</label>
+                    <input type="text" id="card-nickname" placeholder="e.g., My Visa, Business Card" maxlength="50">
+                    <div class="till-payments-modal-buttons">
+                        <button type="button" class="btn-cancel" onclick="document.getElementById(\'till-payments-nickname-modal\').style.display=\'none\'; document.getElementById(\'till_payments_save_card\').checked=false;">Cancel</button>
+                        <button type="button" class="btn-save" onclick="till_payments_save_nickname();">Save Card</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            (function() {
+                var saveCardCheckbox = document.getElementById(\'till_payments_save_card\');
+                if (saveCardCheckbox) {
+                    saveCardCheckbox.addEventListener(\'change\', function() {
+                        if (this.checked) {
+                            // Show the modal
+                            document.getElementById(\'till-payments-nickname-modal\').style.display = \'block\';
+
+                            // Display card info
+                            var brand = document.getElementById(\'till_payments_card_brand\').value || \'Card\';
+                            var expiry = document.getElementById(\'till_payments_card_expiry\').value || \'••/••\';
+                            document.getElementById(\'card-info-display\').textContent = brand + \' •••• Expires: \' + expiry;
+
+                            // Focus on input
+                            document.getElementById(\'card-nickname\').focus();
+                        } else {
+                            document.getElementById(\'till-payments-nickname-modal\').style.display = \'none\';
+                        }
+                    });
+                }
+            })();
+
+            function till_payments_save_nickname() {
+                var nickname = document.getElementById(\'card-nickname\').value.trim();
+                document.getElementById(\'till_payments_card_nickname\').value = nickname;
+                document.getElementById(\'till-payments-nickname-modal\').style.display = \'none\';
+                // Keep the checkbox checked
+                document.getElementById(\'till_payments_save_card\').checked = true;
+            }
+
+            // Allow Enter key to save
+            document.addEventListener(\'keypress\', function(e) {
+                if (e.key === \'Enter\' && document.getElementById(\'till-payments-nickname-modal\').style.display === \'block\') {
+                    if (document.activeElement.id === \'card-nickname\') {
+                        till_payments_save_nickname();
+                        e.preventDefault();
+                    }
+                }
+            });
+            </script>';
+        }
     }
 
     /**
