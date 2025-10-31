@@ -148,8 +148,16 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         payment.init(integrationKey, $cardNumber.prop('id'), $cvv.prop('id'), function(p) {
                             console.log('✓ PaymentJs initialized');
 
+                            // IMMEDIATELY hide all loaders
+                            $('#loader').hide();
+                            $('.payment_box #loader').hide();
+                            $('[id*="loader"]').hide();
+                            console.log('✓ Loader hidden');
+
                             // Show form
                             $form.show();
+                            $form.css('display', 'block');
+                            console.log('✓ Form shown, display:', $form.css('display'));
 
                             // Set styles
                             payment.setNumberStyle(style);
