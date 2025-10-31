@@ -1609,37 +1609,6 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                     <input type="text" class="input-text" id="till_payments_seamless_expiry" maxlength="5" placeholder="MM/YY" inputmode="numeric" style="border-radius: 3px; width: 100% !important; height: 52px !important; padding: 8px !important; box-sizing: border-box !important;">
                 </span>
             </p>
-
-            <!-- Expiry auto-format script -->
-            <script>
-            (function() {
-                var expiryInput = document.getElementById('till_payments_seamless_expiry');
-                if (expiryInput) {
-                    expiryInput.addEventListener('input', function(e) {
-                        var value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-
-                        if (value.length >= 2) {
-                            // Format as MM/YY
-                            value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                        }
-
-                        e.target.value = value;
-                    });
-
-                    // Handle backspace properly
-                    expiryInput.addEventListener('keydown', function(e) {
-                        if (e.key === 'Backspace') {
-                            var value = e.target.value;
-                            // If they backspace the slash, remove it
-                            if (value.length === 3 && value[2] === '/') {
-                                e.target.value = value.substring(0, 2);
-                                e.preventDefault();
-                            }
-                        }
-                    });
-                }
-            })();
-            </script>
             <p class="form-row form-row-last" style="height: 80px; display: block !important; width: 50%; float: left;">
                 <label for="till_payments_seamless_cvv">CVC/CVV Code&nbsp;<abbr class="required" title="required" style="color: #b22222; text-decoration: none;">*</abbr></label>
                 <span class="woocommerce-input-wrapper" style="display: block !important;">
