@@ -59,7 +59,7 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
         }, 999);
         add_action('woocommerce_api_wc_' . $this->id, [$this, 'process_callback']);
         add_filter('script_loader_tag', function ($tag, $handle) {
-            if ($handle !== 'payment_js') {
+            if ($handle !== 'payment_js_' . TILL_PAYMENTS_EXTENSION_VERSION_ID) {
                 return $tag;
             }
             return str_replace(' src', ' data-main="payment-js" src', $tag);
