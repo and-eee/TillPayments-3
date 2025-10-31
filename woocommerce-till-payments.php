@@ -87,6 +87,100 @@ if (!function_exists('woocommerce_clear_cart_url_v1_10_5')) {
     add_action('init', 'woocommerce_clear_cart_url_v1_10_5');
 }
 
+/**
+ * Add "Saved Cards" endpoint to My Account menu
+ */
+add_filter('woocommerce_account_menu_items', function ($items) {
+    // Add saved cards page before Logout
+    $logout = $items['customer-logout'];
+    unset($items['customer-logout']);
+    $items['till-payments-saved-cards'] = 'Saved Cards';
+    $items['customer-logout'] = $logout;
+    return $items;
+});
+
+/**
+ * Register the endpoint
+ */
+add_action('init', function () {
+    add_rewrite_endpoint('till-payments-saved-cards', EP_ROOT | EP_PAGES);
+});
+
+/**
+ * Display saved cards on the My Account page
+ */
+add_action('woocommerce_account_till-payments-saved-cards_endpoint', function () {
+    if (!is_user_logged_in()) {
+        return;
+    }
+
+    $userId = get_current_user_id();
+    $savedCards = get_user_meta($userId, 'till_payments_v1_10_5_saved_cards', true);
+    $savedCards = is_array($savedCards) ? $savedCards : [];
+
+    echo '<h2>Saved Payment Cards</h2>';
+
+    if (empty($savedCards)) {
+        echo '<p>You have no saved cards. When you make a purchase, you can choose to save your card for future use.</p>';
+        return;
+    }
+
+    echo '<table class="woocommerce-table woocommerce-table--orders">';
+    echo '<thead><tr>';
+    echo '<th class="woocommerce-table__heading">Card</th>';
+    echo '<th class="woocommerce-table__heading">Expires</th>';
+    echo '<th class="woocommerce-table__heading">Saved</th>';
+    echo '<th class="woocommerce-table__heading">Action</th>';
+    echo '</tr></thead>';
+    echo '<tbody>';
+
+    foreach ($savedCards as $cardId => $card) {
+        $cardDisplay = isset($card['brand']) ? $card['brand'] : 'Card';
+        $cardDisplay .= ' •••• ' . (isset($card['last_4']) ? $card['last_4'] : '****');
+
+        echo '<tr>';
+        echo '<td class="woocommerce-table__cell woocommerce-table__cell-order-number">' . esc_html($cardDisplay) . '</td>';
+        echo '<td class="woocommerce-table__cell">' . esc_html(isset($card['expiry']) ? $card['expiry'] : 'N/A') . '</td>';
+        echo '<td class="woocommerce-table__cell">' . esc_html(isset($card['saved_date']) ? date('M j, Y', strtotime($card['saved_date'])) : 'N/A') . '</td>';
+        echo '<td class="woocommerce-table__cell">';
+        echo '<form method="POST" style="display:inline;">';
+        wp_nonce_field('till_payments_delete_card');
+        echo '<input type="hidden" name="delete_card_id" value="' . esc_attr($cardId) . '">';
+        echo '<button type="submit" class="button button-secondary" onclick="return confirm(\'Are you sure you want to delete this card?\');">Delete</button>';
+        echo '</form>';
+        echo '</td>';
+        echo '</tr>';
+    }
+
+    echo '</tbody></table>';
+});
+
+/**
+ * Handle card deletion from My Account page
+ */
+add_action('init', function () {
+    if (is_user_logged_in() && !empty($_POST['delete_card_id'])) {
+        // Verify nonce
+        if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'till_payments_delete_card')) {
+            wp_die('Security check failed');
+        }
+
+        $userId = get_current_user_id();
+        $cardId = sanitize_text_field($_POST['delete_card_id']);
+        $savedCards = get_user_meta($userId, 'till_payments_v1_10_5_saved_cards', true);
+        $savedCards = is_array($savedCards) ? $savedCards : [];
+
+        if (isset($savedCards[$cardId])) {
+            unset($savedCards[$cardId]);
+            update_user_meta($userId, 'till_payments_v1_10_5_saved_cards', $savedCards);
+            wc_add_notice('Card has been deleted successfully.', 'success');
+            wp_safe_remote_post(admin_url('admin-ajax.php')); // Redirect to same page
+            wp_redirect(wc_get_account_endpoint_url('till-payments-saved-cards'));
+            exit;
+        }
+    }
+});
+
 add_action('plugins_loaded', function () {
     require_once TILL_PAYMENTS_V1_10_5_EXTENSION_BASEDIR . 'classes/includes/till-payments-provider.php';
     require_once TILL_PAYMENTS_V1_10_5_EXTENSION_BASEDIR . 'classes/includes/till-payments-creditcard.php';
