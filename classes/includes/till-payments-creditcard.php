@@ -270,6 +270,28 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                 console.log('CVV valid:', validCvv);
                             });
 
+                            // Show save card section when payment form is ready
+                            $('#till-payments-save-card-section').show();
+
+                            // Handle save card checkbox
+                            $('#till_payments_save_card').on('change', function() {
+                                if ($(this).is(':checked')) {
+                                    $('#till-payments-save-card-fields').slideDown();
+                                    $('#till_payments_card_last_4').focus();
+                                } else {
+                                    $('#till-payments-save-card-fields').slideUp();
+                                    // Clear fields when unchecked
+                                    $('#till_payments_card_last_4').val('');
+                                    $('#till_payments_card_nickname').val('');
+                                }
+                            });
+
+                            // Auto-capture expiry when user leaves the expiry field
+                            $expiry.on('change blur', function() {
+                                $('#till_payments_card_expiry').val($(this).val());
+                                console.log('✓ Expiry captured:', $(this).val());
+                            });
+
                             // Handle submit
                             $submitBtn.on('click', function(e) {
                                 if ($token.val()) {
