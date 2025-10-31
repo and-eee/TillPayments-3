@@ -34,6 +34,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
 
     public $id = 'applepay';
 
+    // Store the original gateway ID to read settings from the original plugin
+    protected $original_gateway_id = 'till_payments_applepay';
+
     public $method_title = 'Apple Pay';
 
     /**
