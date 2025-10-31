@@ -867,6 +867,8 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                     default:
                         $this->order->payment_complete($result->getPurchaseId());
                         $this->order->add_order_note('TillPayments purchase ID: '.$result->getPurchaseId(), false);
+                        // Explicitly ensure status is set to processing (handles cases where payment_complete() may not reliably set it)
+                        $this->order->update_status('processing', 'Payment completed successfully');
                         break;
                 }
 
