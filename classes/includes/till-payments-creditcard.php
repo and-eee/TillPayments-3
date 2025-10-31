@@ -708,11 +708,11 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     /**
      * Save a vault token securely for a user (only for logged-in users)
      * SECURITY: Encrypts tokens at rest, enforces HTTPS, logs all operations
-     * Stores: encrypted vault token, last 4 digits, card brand, expiry date
+     * Stores: encrypted vault token, last 4 digits, card brand, expiry date, custom nickname
      *
      * @param int $userId User ID
      * @param string $vaultToken Vault token from Till Payments
-     * @param array $cardDetails Card metadata (last_4, brand, expiry)
+     * @param array $cardDetails Card metadata (last_4, brand, expiry, nickname)
      * @return string|false Card ID if saved, false otherwise
      */
     private function saveCardToken($userId, $vaultToken, $cardDetails = [])
@@ -740,10 +740,18 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         $cardId = wp_generate_password(16, false);
         $encryptedToken = $this->encryptToken($vaultToken);
 
+        // Build card display name from nickname and brand
+        $nickname = isset($cardDetails['nickname']) ? sanitize_text_field($cardDetails['nickname']) : '';
+        $brand = isset($cardDetails['brand']) ? sanitize_text_field($cardDetails['brand']) : 'Card';
+
+        // If user provided a nickname, use it; otherwise just show the brand
+        $displayName = $nickname ? $nickname : $brand;
+
         $savedCards[$cardId] = [
             'token_encrypted' => $encryptedToken, // SECURITY: Encrypted vault token
+            'nickname' => $nickname, // User's custom name (optional)
             'last_4' => isset($cardDetails['last_4']) ? sanitize_text_field($cardDetails['last_4']) : 'XXXX',
-            'brand' => isset($cardDetails['brand']) ? sanitize_text_field($cardDetails['brand']) : 'Card',
+            'brand' => $brand,
             'expiry' => isset($cardDetails['expiry']) ? sanitize_text_field($cardDetails['expiry']) : '',
             'saved_date' => current_time('mysql'),
         ];
@@ -754,10 +762,11 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         // SECURITY: Audit logging - card save operation
         $this->log(
             sprintf(
-                'AUDIT: Card saved for user %d | Card ID: %s | Brand: %s | Last 4: %s | Expiry: %s',
+                'AUDIT: Card saved for user %d | Card ID: %s | Nickname: %s | Brand: %s | Last 4: %s | Expiry: %s',
                 $userId,
                 $cardId,
-                $savedCards[$cardId]['brand'],
+                $nickname ?: '(no nickname)',
+                $brand,
                 $savedCards[$cardId]['last_4'],
                 $savedCards[$cardId]['expiry']
             ),
