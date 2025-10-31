@@ -950,7 +950,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_ApplePay')) {
         }
         #applepay-button { display: none; }
         #applepay-button_notsupported {  }
-        #payment .payment_methods li .payment_box.payment_method_till_payments_applepay { padding: 0; } 
+        #payment .payment_methods li .payment_box[class*="payment_method_"][class*="till_payments"][class*="applepay"] { padding: 0; }
         </style>
         <div id="till_payments_applepay_errors"></div>
         <div id="till_payments_applepay">
