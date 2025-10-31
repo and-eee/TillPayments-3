@@ -376,7 +376,7 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
                 /**
                  * seamless will finish here ONLY FOR NON-3DS SEAMLESS
                  */
-                $this->order->add_meta_data('paymentUuid', $result->getReferenceId(), true);
+                $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
                 switch ($transactionRequest) {
