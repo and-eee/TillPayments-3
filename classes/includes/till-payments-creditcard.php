@@ -73,6 +73,83 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 return;
             }
             ?>
+            <style>
+                /* Improved payment processing loader */
+                #till-payments-processing-overlay {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.4);
+                    backdrop-filter: blur(4px);
+                    -webkit-backdrop-filter: blur(4px);
+                    z-index: 99999;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                #till-payments-processing-overlay.active {
+                    display: flex !important;
+                }
+
+                .till-payments-loader-box {
+                    background: white;
+                    padding: 40px;
+                    border-radius: 8px;
+                    text-align: center;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                    max-width: 400px;
+                    animation: slideUp 0.3s ease-out;
+                }
+
+                @keyframes slideUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .till-payments-spinner {
+                    width: 50px;
+                    height: 50px;
+                    border: 4px solid #f0f0f0;
+                    border-top: 4px solid #3498db;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                    margin: 0 auto 25px;
+                }
+
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+
+                .till-payments-loader-text {
+                    font-size: 18px;
+                    color: #333;
+                    margin: 0 0 15px 0;
+                    font-weight: 500;
+                }
+
+                .till-payments-loader-warning {
+                    font-size: 14px;
+                    color: #666;
+                    margin: 0;
+                    line-height: 1.5;
+                }
+
+                .till-payments-loader-warning strong {
+                    color: #d9534f;
+                    display: block;
+                    margin-top: 10px;
+                }
+            </style>
             <script>
             (function () {
                 console.log('✓ Till Payments footer initialization starting');
