@@ -200,6 +200,10 @@
 
                     })
                     .catch(err => {
+                        // Hide loader, message, and overlay on error
+                        $('#loader').hide();
+                        $('#till_payments_processing_message').hide();
+                        $('#till_payments_overlay').hide();
                         window.applePaySessionInstance.abort();
                         console.error('APPLE PAY Order submission was not successful!', err);
                         self.$tillPaymentsErrors.html('An error occurred while processing the payment.');
