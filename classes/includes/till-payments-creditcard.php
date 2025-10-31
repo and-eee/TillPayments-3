@@ -270,42 +270,49 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                     // Set token immediately
                                     $token.val(token);
 
-                                    // CAPTURE SAFE CARD METADATA ONLY
-                                    // SECURITY: Only capture last 4 digits, brand, and expiry
-                                    // NEVER attempt to access full card number (PCI DSS violation)
-                                    payment.getCardData(function(cardData) {
-                                        console.log('Capturing card metadata for safe storage');
+                                    // USE CAPTURED CARD METADATA
+                                    // Last 4 was captured during card validation (numberOn event)
+                                    // Don't rely on getCardData() - PaymentJs doesn't expose card details for security
 
-                                        // SECURITY: Default values if metadata not available
-                                        var cardLastFour = 'XXXX';
-                                        var cardBrand = 'Credit Card';
+                                    var cardLastFour = capturedCardLast4 || 'XXXX';
+                                    var cardBrand = 'Credit Card';
 
-                                        // SECURITY: Only extract SAFE metadata (last 4, brand)
-                                        // Do NOT attempt to extract full card number
-                                        if (cardData && cardData.last4) {
-                                            cardLastFour = cardData.last4;
-                                        } else if (cardData && cardData.lastFour) {
-                                            cardLastFour = cardData.lastFour;
-                                        }
+                                    // Try getCardData as fallback for brand info
+                                    if (payment.getCardData && typeof payment.getCardData === 'function') {
+                                        payment.getCardData(function(cardData) {
+                                            if (cardData && cardData.brand) {
+                                                cardBrand = cardData.brand;
+                                                console.log('✓ Brand from cardData:', cardBrand);
+                                            }
 
-                                        if (cardData && cardData.brand) {
-                                            cardBrand = cardData.brand;
-                                        }
+                                            // Populate hidden fields with SAFE data only
+                                            $('#till_payments_card_last_4').val(cardLastFour);
+                                            $('#till_payments_card_brand').val(cardBrand);
+                                            $('#till_payments_card_expiry').val($expiry.val());
 
-                                        // Populate hidden fields with SAFE data only
+                                            console.log('✓ Card metadata prepared:', {
+                                                last_4: cardLastFour,
+                                                brand: cardBrand,
+                                                expiry: $expiry.val()
+                                            });
+
+                                            // Submit form with safe metadata
+                                            $form.closest('form').submit();
+                                        });
+                                    } else {
+                                        // getCardData not available, submit with what we have
                                         $('#till_payments_card_last_4').val(cardLastFour);
                                         $('#till_payments_card_brand').val(cardBrand);
                                         $('#till_payments_card_expiry').val($expiry.val());
 
-                                        console.log('✓ Card metadata captured (safe):', {
+                                        console.log('✓ Card metadata prepared (no getCardData):', {
                                             last_4: cardLastFour,
                                             brand: cardBrand,
                                             expiry: $expiry.val()
                                         });
 
-                                        // Submit form with safe metadata
                                         $form.closest('form').submit();
-                                    });
+                                    }
                                 },
                                 function(errors) {
                                     console.error('Payment errors:', errors);
