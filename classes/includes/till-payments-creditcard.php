@@ -628,13 +628,7 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
                 'description' => 'Shared Secret',
                 'default' => '',
             ],
-            'integrationKey' => [
-                'title' => 'Integration Key',
-                'type' => 'text',
-                'label' => 'Integration Key',
-                'description' => 'Integration Key',
-                'default' => '',
-            ],
+            // Integration Key is hard-coded for this instance
             'transactionRequest' => [
                 'title' => 'Transaction Request',
                 'type' => 'select',
