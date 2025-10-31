@@ -746,6 +746,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     /**
      * Get all saved cards for the current user
+     * SECURITY: Decrypts vault tokens from encrypted storage
+     *
+     * @param int|null $userId User ID (uses current user if not specified)
+     * @return array Array of saved cards with decrypted tokens
      */
     private function getSavedCards($userId = null)
     {
@@ -758,7 +762,52 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         }
 
         $savedCards = get_user_meta($userId, 'till_payments_v1_10_5_saved_cards', true);
-        return is_array($savedCards) ? $savedCards : [];
+        if (!is_array($savedCards)) {
+            return [];
+        }
+
+        // SECURITY: Decrypt tokens for use
+        $decryptedCards = [];
+        foreach ($savedCards as $cardId => $card) {
+            $decryptedCard = $card;
+
+            // Decrypt encrypted token
+            if (isset($card['token_encrypted'])) {
+                $decryptedToken = $this->decryptToken($card['token_encrypted']);
+                if ($decryptedToken === false) {
+                    $this->log(
+                        sprintf('AUDIT: Failed to decrypt card token for user %d, card %s', $userId, $cardId),
+                        WC_Log_Levels::WARNING,
+                        'CardOperations'
+                    );
+                    continue; // Skip cards that fail decryption
+                }
+                $decryptedCard['token_plain'] = $decryptedToken;
+                unset($decryptedCard['token_encrypted']);
+            }
+
+            // Support legacy plaintext tokens (for migration only)
+            if (isset($card['token_plain']) && !isset($card['token_encrypted'])) {
+                $this->log(
+                    sprintf('SECURITY: Found legacy plaintext token for user %d, card %s', $userId, $cardId),
+                    WC_Log_Levels::WARNING,
+                    'CardOperations'
+                );
+            }
+
+            $decryptedCards[$cardId] = $decryptedCard;
+        }
+
+        // SECURITY: Audit logging - card retrieval
+        if (!empty($decryptedCards)) {
+            $this->log(
+                sprintf('AUDIT: Retrieved %d saved cards for user %d', count($decryptedCards), $userId),
+                WC_Log_Levels::DEBUG,
+                'CardOperations'
+            );
+        }
+
+        return $decryptedCards;
     }
 
     /**
