@@ -4,7 +4,15 @@
 	    var $paymentFormSubmitButton = $("#place_order");
 	    var $paymentFormTokenInput = $('#till_payments_token');
 	    var $tillPaymentsErrors = $('#till_payments_errors');
-	    var integrationKey = window.integrationKey;
+	    // Get version ID from window object keys matching pattern
+	    var versionId = '';
+	    for (var key in window) {
+	        if (key.startsWith('integrationKey_')) {
+	            versionId = key.substring('integrationKey_'.length);
+	            break;
+	        }
+	    }
+	    var integrationKey = versionId ? window['integrationKey_' + versionId] : window.integrationKey;
 	    var initialized = false;
 	    var init = function () {
 	        if (integrationKey && !initialized) {
