@@ -1273,6 +1273,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             echo '<p class="form-row form-row-wide" style="margin-top: 15px;">
                 <input type="checkbox" id="till_payments_save_card" name="till_payments_save_card" value="yes" style="width: auto; margin-right: 8px;">
                 <label for="till_payments_save_card" style="display: inline; font-weight: normal;">Save this card for future purchases</label>
+                <!-- Hidden fields for card details captured by PaymentJs -->
+                <input type="hidden" id="till_payments_card_last_4" name="till_payments_card_last_4" value="">
+                <input type="hidden" id="till_payments_card_brand" name="till_payments_card_brand" value="">
+                <input type="hidden" id="till_payments_card_expiry" name="till_payments_card_expiry" value="">
             </p>';
         }
 
