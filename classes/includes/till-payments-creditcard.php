@@ -195,6 +195,22 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         var $errors = $('#till_payments_errors');
                         var $submitBtn = $("#place_order");
 
+                        // Inject loader overlay HTML if it doesn't exist
+                        if ($('#till-payments-processing-overlay').length === 0) {
+                            var loaderHtml = '<div id="till-payments-processing-overlay">' +
+                                '<div class="till-payments-loader-box">' +
+                                '<div class="till-payments-spinner"></div>' +
+                                '<p class="till-payments-loader-text">Processing your payment...</p>' +
+                                '<p class="till-payments-loader-warning">' +
+                                'Please do not close or refresh this page.' +
+                                '<strong>Your payment is being processed securely.</strong>' +
+                                '</p>' +
+                                '</div>' +
+                                '</div>';
+                            $('body').append(loaderHtml);
+                            console.log('✓ Payment processing overlay injected into DOM');
+                        }
+
                         // AUTO-FORMAT EXPIRY FIELD (MM/YY)
                         if ($expiry.length) {
                             $expiry.on('input', function() {
