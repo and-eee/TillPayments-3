@@ -683,7 +683,7 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
             ->setBillingPhone($this->sanitizeField('billingPhone', $this->order->get_billing_phone()))
             ->setBillingPostcode($this->sanitizeField('billingPostcode', $this->order->get_billing_postcode()))
             ->setBillingState($this->sanitizeField('billingState', $this->order->get_billing_state()))
-            ->setCompany($this->sanitizeField('company', $this->order->get_billing_company()))
+            ->setCompany($this->sanitizeField('company', substr($this->order->get_billing_company(), 0, 55)))
             ->setEmail($this->sanitizeField('email', $this->order->get_billing_email()))
             ->setFirstName($this->sanitizeField('firstName', $this->order->get_billing_first_name()))
             ->setIpAddress(WC_Geolocation::get_ip_address()) // $this->order->get_customer_ip_address()
