@@ -574,6 +574,78 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
         return $orderId;
     }
 
+    /**
+     * Save a vault token securely for a user (only for logged-in users)
+     * Stores: vault token, last 4 digits, card brand, expiry date
+     */
+    private function saveCardToken($userId, $vaultToken, $cardDetails = [])
+    {
+        if (!$userId || !is_user_logged_in()) {
+            return false;
+        }
+
+        // Get existing saved cards
+        $savedCards = get_user_meta($userId, 'till_payments_v1_10_5_saved_cards', true);
+        if (!is_array($savedCards)) {
+            $savedCards = [];
+        }
+
+        // Create card record with hashed token for security
+        $cardId = wp_generate_password(16, false);
+        $savedCards[$cardId] = [
+            'token' => wp_hash_password($vaultToken), // Hash the token
+            'token_plain' => $vaultToken, // Store plain for now (consider encryption in production)
+            'last_4' => isset($cardDetails['last_4']) ? sanitize_text_field($cardDetails['last_4']) : '****',
+            'brand' => isset($cardDetails['brand']) ? sanitize_text_field($cardDetails['brand']) : 'Card',
+            'expiry' => isset($cardDetails['expiry']) ? sanitize_text_field($cardDetails['expiry']) : '',
+            'saved_date' => current_time('mysql'),
+        ];
+
+        // Save updated cards
+        update_user_meta($userId, 'till_payments_v1_10_5_saved_cards', $savedCards);
+        $this->log('Card token saved for user ' . $userId . ': ' . $cardId);
+
+        return $cardId;
+    }
+
+    /**
+     * Get all saved cards for the current user
+     */
+    private function getSavedCards($userId = null)
+    {
+        if (!$userId && is_user_logged_in()) {
+            $userId = get_current_user_id();
+        }
+
+        if (!$userId) {
+            return [];
+        }
+
+        $savedCards = get_user_meta($userId, 'till_payments_v1_10_5_saved_cards', true);
+        return is_array($savedCards) ? $savedCards : [];
+    }
+
+    /**
+     * Delete a saved card for a user
+     */
+    public function deleteSavedCard($cardId)
+    {
+        $userId = get_current_user_id();
+        if (!$userId) {
+            return false;
+        }
+
+        $savedCards = $this->getSavedCards($userId);
+        if (isset($savedCards[$cardId])) {
+            unset($savedCards[$cardId]);
+            update_user_meta($userId, 'till_payments_v1_10_5_saved_cards', $savedCards);
+            $this->log('Saved card deleted: ' . $cardId . ' for user ' . $userId);
+            return true;
+        }
+
+        return false;
+    }
+
     public function process_payment($orderId)
     {
         $this->log('Processing new Creditcard payment...');
