@@ -13,13 +13,27 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('TILL_PAYMENTS_EXTENSION_URL', 'https://gateway.tillpayments.com/');
-define('TILL_PAYMENTS_EXTENSION_URL_TEST', 'https://test-gateway.tillpayments.com/');
-define('TILL_PAYMENTS_EXTENSION_NAME', 'Till Payments');
-define('TILL_PAYMENTS_EXTENSION_VERSION', '1.10.5');
-define('TILL_PAYMENTS_EXTENSION_UID_PREFIX', 'till_payments_');
-define('TILL_PAYMENTS_EXTENSION_BASEDIR', plugin_dir_path(__FILE__));
-define('TILL_PAYMENTS_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_PAYMENTS_EXTENSION_VERSION));
+if (!defined('TILL_PAYMENTS_EXTENSION_URL')) {
+    define('TILL_PAYMENTS_EXTENSION_URL', 'https://gateway.tillpayments.com/');
+}
+if (!defined('TILL_PAYMENTS_EXTENSION_URL_TEST')) {
+    define('TILL_PAYMENTS_EXTENSION_URL_TEST', 'https://test-gateway.tillpayments.com/');
+}
+if (!defined('TILL_PAYMENTS_EXTENSION_NAME')) {
+    define('TILL_PAYMENTS_EXTENSION_NAME', 'Till Payments');
+}
+if (!defined('TILL_PAYMENTS_EXTENSION_VERSION')) {
+    define('TILL_PAYMENTS_EXTENSION_VERSION', '1.10.5');
+}
+if (!defined('TILL_PAYMENTS_EXTENSION_UID_PREFIX')) {
+    define('TILL_PAYMENTS_EXTENSION_UID_PREFIX', 'till_payments_');
+}
+if (!defined('TILL_PAYMENTS_EXTENSION_BASEDIR')) {
+    define('TILL_PAYMENTS_EXTENSION_BASEDIR', plugin_dir_path(__FILE__));
+}
+if (!defined('TILL_PAYMENTS_EXTENSION_VERSION_ID')) {
+    define('TILL_PAYMENTS_EXTENSION_VERSION_ID', str_replace('.', '_', TILL_PAYMENTS_EXTENSION_VERSION));
+}
 
 add_action('plugins_loaded', function () {
     require_once TILL_PAYMENTS_EXTENSION_BASEDIR . 'classes/includes/till-payments-provider.php';
