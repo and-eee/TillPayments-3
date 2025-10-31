@@ -651,10 +651,10 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
 
     public function payment_fields()
     {
-        wp_enqueue_script('payment_js');
-        wp_enqueue_script('till_payments_js_' . $this->id);
+        wp_enqueue_script('payment_js_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
+        wp_enqueue_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID);
 
-        echo '<script>window.integrationKey="' . $this->get_option('integrationKey') . '";</script>
+        echo '<script>window.integrationKey_' . TILL_PAYMENTS_EXTENSION_VERSION_ID . '="' . $this->get_option('integrationKey') . '";</script>
         <style>.payment_box iframe { width: 100%!important } #till_payments_errors{color: red; } 
         #loader {
           position: absolute;  
