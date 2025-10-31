@@ -253,34 +253,40 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                     // Set token immediately
                                     $token.val(token);
 
-                                    // CAPTURE CARD DETAILS FOR SAVING
-                                    // Extract last 4 from card number using PaymentJs data
+                                    // CAPTURE SAFE CARD METADATA ONLY
+                                    // SECURITY: Only capture last 4 digits, brand, and expiry
+                                    // NEVER attempt to access full card number (PCI DSS violation)
                                     payment.getCardData(function(cardData) {
-                                        // cardData should contain payment information
-                                        console.log('Card data available for storage:', cardData);
+                                        console.log('Capturing card metadata for safe storage');
 
-                                        // PaymentJs may not expose raw card number, so we try to get it from the iframe
-                                        // Alternatively, we'll use a generic approach
-                                        var cardLastFour = 'XXXX'; // Default fallback
+                                        // SECURITY: Default values if metadata not available
+                                        var cardLastFour = 'XXXX';
+                                        var cardBrand = 'Credit Card';
 
-                                        // Try to extract from available payment data
-                                        if (cardData && cardData.cardNumber) {
-                                            var cardNum = cardData.cardNumber.toString();
-                                            cardLastFour = cardNum.slice(-4);
+                                        // SECURITY: Only extract SAFE metadata (last 4, brand)
+                                        // Do NOT attempt to extract full card number
+                                        if (cardData && cardData.last4) {
+                                            cardLastFour = cardData.last4;
+                                        } else if (cardData && cardData.lastFour) {
+                                            cardLastFour = cardData.lastFour;
                                         }
 
-                                        // Populate hidden fields for server-side card storage
+                                        if (cardData && cardData.brand) {
+                                            cardBrand = cardData.brand;
+                                        }
+
+                                        // Populate hidden fields with SAFE data only
                                         $('#till_payments_card_last_4').val(cardLastFour);
-                                        $('#till_payments_card_brand').val(cardData && cardData.cardBrand ? cardData.cardBrand : 'Credit Card');
+                                        $('#till_payments_card_brand').val(cardBrand);
                                         $('#till_payments_card_expiry').val($expiry.val());
 
-                                        console.log('Card details captured:', {
-                                            last_4: $('#till_payments_card_last_4').val(),
-                                            brand: $('#till_payments_card_brand').val(),
-                                            expiry: $('#till_payments_card_expiry').val()
+                                        console.log('✓ Card metadata captured (safe):', {
+                                            last_4: cardLastFour,
+                                            brand: cardBrand,
+                                            expiry: $expiry.val()
                                         });
 
-                                        // NOW submit the form after card data is captured
+                                        // Submit form with safe metadata
                                         $form.closest('form').submit();
                                     });
                                 },
