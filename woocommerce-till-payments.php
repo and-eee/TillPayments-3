@@ -134,13 +134,13 @@ if (!function_exists('woocommerce_clear_cart_url_v1_10_5')) {
 }
 
 /**
- * Register the saved cards endpoint early (before flush_rewrite_rules)
- * This must happen in plugins_loaded so WooCommerce is initialized
+ * Register the saved cards endpoint
+ * MUST be in init hook - NOT plugins_loaded (wp_rewrite not ready yet)
  */
-add_action('plugins_loaded', function () {
-    // Register endpoint - must happen before we try to use it
+add_action('init', function () {
+    // Register endpoint - wp_rewrite is now initialized
     add_rewrite_endpoint('till-payments-saved-cards', EP_ROOT | EP_PAGES);
-}, 1); // Priority 1 = early, before other plugins_loaded hooks
+});
 
 /**
  * Add "Saved Cards" endpoint to My Account menu
