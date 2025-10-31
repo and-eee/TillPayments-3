@@ -307,7 +307,7 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
             ->setCallbackUrl($this->callbackUrl)
             ->setCancelUrl(wc_get_checkout_url())
             ->setSuccessUrl($this->paymentSuccessUrl($this->order))
-            ->setErrorUrl(add_query_arg(['gateway_return_result' => 'error'], $this->get_option('integrationKey') ? $this->order->get_checkout_payment_url(false) : wc_get_checkout_url()));
+            ->setErrorUrl(add_query_arg(['gateway_return_result' => 'error'], TILL_PAYMENTS_INTEGRATION_KEY ? $this->order->get_checkout_payment_url(false) : wc_get_checkout_url()));
         
         /**
          * integration key is set -> seamless
