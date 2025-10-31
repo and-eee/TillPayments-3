@@ -309,8 +309,8 @@ if (!class_exists('WC_TillPayments_ApplePay')) {
         }
 
         $orderTxId = $this->encodeOrderId($order_id);
-        // keep track of last tx id 
-        $this->order->add_meta_data('orderTxId', $orderTxId, true); 
+        // keep track of last tx id
+        $this->order->add_meta_data('orderTxId_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $orderTxId, true); 
         $this->order->save_meta_data();
         $transaction->setTransactionId($orderTxId)
             ->setAmount(floatval($this->order->get_total()))
