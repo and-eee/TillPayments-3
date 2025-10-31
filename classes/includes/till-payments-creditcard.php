@@ -7,6 +7,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     {
     public $id = 'creditcard_v1_10_5';
 
+    // Store the original gateway ID to read settings from the original plugin
+    protected $original_gateway_id = 'till_payments_creditcard';
+
     public $method_title = 'Credit Card';
 
     /**
