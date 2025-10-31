@@ -999,10 +999,22 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
 
     private function paymentFailedResponse()
     {
-        $this->order->update_status('failed', __('Payment failed or was declined', 'woocommerce'));
-        $this->order->add_order_note('TillPayments payment failed or was declined', false);
+        $this->order->add_order_note(__('Payment failed or was declined', 'woocommerce'));
+        // Send failed order email notification
+        WC()->mailer()->get_emails()['WC_Email_Failed_Order']->trigger($this->order->get_id());
         $this->order->save();
-        wc_add_notice(__('Payment failed or was declined', 'woocommerce'), 'error');
+
+        wc_add_notice(
+            __(
+                '<div style="background-color: white; color: red; border: 3px solid red; padding: 20px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <p style="font-weight: bold; font-size: 1.4em; color: red; margin-bottom: 10px;">Payment failed or was declined</p>
+                    <p style="margin-top: 0; line-height: 1.2;">You can try again, or call us on (02) 9640 0366 to find out more.</p>
+                </div>',
+                'woocommerce'
+            ),
+            'error'
+        );
+
         return [
             'result' => 'error',
             'redirect' => $this->get_return_url($this->order),
