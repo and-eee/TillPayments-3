@@ -873,11 +873,11 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                     $userId = get_current_user_id();
                     $vaultToken = $result->getReferenceId();
 
-                    // Extract card details from order
+                    // Extract card details from hidden fields populated by JavaScript
                     $cardDetails = [
-                        'last_4' => substr($this->get_post_data()['card_number'] ?? '', -4),
-                        'brand' => 'Credit Card',
-                        'expiry' => $this->get_post_data()['expiry'] ?? '',
+                        'last_4' => !empty($_POST['till_payments_card_last_4']) ? sanitize_text_field($_POST['till_payments_card_last_4']) : 'XXXX',
+                        'brand' => !empty($_POST['till_payments_card_brand']) ? sanitize_text_field($_POST['till_payments_card_brand']) : 'Credit Card',
+                        'expiry' => !empty($_POST['till_payments_card_expiry']) ? sanitize_text_field($_POST['till_payments_card_expiry']) : '',
                     ];
 
                     $savedCardId = $this->saveCardToken($userId, $vaultToken, $cardDetails);
