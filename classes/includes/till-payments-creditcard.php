@@ -1086,6 +1086,21 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                 /**
                  * seamless will finish here ONLY FOR NON-3DS SEAMLESS
                  */
+
+                // SECURITY & IDEMPOTENCY: Check if payment has already been processed
+                // This prevents duplicate processing if callback also fires for this payment
+                $alreadyProcessed = $this->order->get_meta('payment_processed_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID);
+                if ($alreadyProcessed === 'yes') {
+                    $this->log('  > Payment already processed for order ' . $orderId . ', skipping duplicate processing');
+                    $this->log('  > return type: FINISHED (already processed)');
+                    return [
+                        'result' => 'success',
+                        'redirect' => $this->paymentSuccessUrl($this->order),
+                    ];
+                }
+
+                // Mark payment as processed to prevent callback from reprocessing
+                $this->order->add_meta_data('payment_processed_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, 'yes', true);
                 $this->order->add_meta_data('paymentUuid_' . TILL_PAYMENTS_V1_10_5_EXTENSION_VERSION_ID, $result->getReferenceId(), true);
                 $this->order->save_meta_data();
 
@@ -1128,10 +1143,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                         break;
                     case 'debit':
                     default:
-                        $this->order->payment_complete($result->getPurchaseId());
                         $this->order->add_order_note('TillPayments purchase ID: '.$result->getPurchaseId(), false);
-                        // Explicitly ensure status is set to processing (handles cases where payment_complete() may not reliably set it)
-                        $this->order->update_status('processing', 'Payment completed successfully');
+                        // IDEMPOTENCY: Use only payment_complete() to set status, not both payment_complete() + update_status()
+                        // This prevents conflicting status updates that cause multiple status changes
+                        $this->order->payment_complete($result->getPurchaseId());
                         break;
                 }
 
