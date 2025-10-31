@@ -82,10 +82,13 @@
 	                return new Promise((res, rej) => {
 	                    let retryCounter = 0;
 	                    const findScriptElement = el => {
-	                        if (document.querySelector(el) !== null) 
+	                        // Check if PaymentJs library is loaded
+	                        if (typeof PaymentJs !== 'undefined') {
 	                            res(new PaymentJs('1.3'));
-	                        else if (retryCounter == 50) 
-	                            rej("Payment Js script failed to load"); 
+	                        }
+	                        else if (retryCounter == 50) {
+	                            rej("Payment Js script failed to load");
+	                        }
 	                        else {
 	                            retryCounter += 1;
 	                            setTimeout(() => findScriptElement(el), 100);
