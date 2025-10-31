@@ -250,11 +250,14 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                 function(token) {
                                     console.log('✓ Token received');
 
+                                    // Set token immediately
+                                    $token.val(token);
+
                                     // CAPTURE CARD DETAILS FOR SAVING
                                     // Extract last 4 from card number using PaymentJs data
                                     payment.getCardData(function(cardData) {
                                         // cardData should contain payment information
-                                        console.log('Card data available for storage');
+                                        console.log('Card data available for storage:', cardData);
 
                                         // PaymentJs may not expose raw card number, so we try to get it from the iframe
                                         // Alternatively, we'll use a generic approach
@@ -272,13 +275,14 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                         $('#till_payments_card_expiry').val($expiry.val());
 
                                         console.log('Card details captured:', {
-                                            last_4: cardLastFour,
-                                            expiry: $expiry.val()
+                                            last_4: $('#till_payments_card_last_4').val(),
+                                            brand: $('#till_payments_card_brand').val(),
+                                            expiry: $('#till_payments_card_expiry').val()
                                         });
-                                    });
 
-                                    $token.val(token);
-                                    $form.closest('form').submit();
+                                        // NOW submit the form after card data is captured
+                                        $form.closest('form').submit();
+                                    });
                                 },
                                 function(errors) {
                                     console.error('Payment errors:', errors);
