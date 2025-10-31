@@ -9,7 +9,7 @@ use TillPayments\Client\Transaction\Refund;
 if (!class_exists('WC_TillPayments_V1_10_5_GooglePay')) {
     class WC_TillPayments_V1_10_5_GooglePay extends WC_Payment_Gateway
     {
-    public $id = 'googlepay_v1_10_5';
+    public $id = 'googlepay';
 
     // Store the original gateway ID to read settings from the original plugin
     protected $original_gateway_id = 'till_payments_googlepay';
