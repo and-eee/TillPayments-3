@@ -869,6 +869,15 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
     {
         $this->log('Processing new Creditcard payment...');
 
+        // SECURITY: Enforce HTTPS for all card transactions
+        try {
+            $this->enforceHttps();
+        } catch (\Exception $e) {
+            $this->log('HTTPS enforcement failed during payment: ' . $e->getMessage(), WC_Log_Levels::ERROR, 'CardSecurity');
+            wc_add_notice(__('Payment processing requires a secure connection. Please try again.', 'woocommerce'), 'error');
+            return ['result' => 'error'];
+        }
+
         global $woocommerce;
 
         /**
