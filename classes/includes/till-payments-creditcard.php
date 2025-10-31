@@ -367,6 +367,10 @@ if (!class_exists('WC_TillPayments_V1_10_5_CreditCard')) {
                                 },
                                 function(errors) {
                                     console.error('Payment errors:', errors);
+                                    // Hide loader, message, and overlay on error
+                                    $('#loader').hide();
+                                    $('#till_payments_processing_message').hide();
+                                    $('#till_payments_overlay').hide();
                                     $errors.html(errors.map(e => e.message).join('<br>'));
                                 });
 
