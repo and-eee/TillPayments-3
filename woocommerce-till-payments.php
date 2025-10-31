@@ -138,8 +138,8 @@ add_action('plugins_loaded', function () {
                     $gateway->log('  > return type: FINISHED');
                     $order->add_order_note('TillPayments capture ID: ' . $result->getReferenceId(), false);
 
-                    $order->update_meta_data('paymentUuid', $result->getReferenceId());
-                    $order->update_meta_data('pending_capture', 'no');
+                    $order->update_meta_data('paymentUuid_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $result->getReferenceId());
+                    $order->update_meta_data('pending_capture_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, 'no');
                     $order->save_meta_data();
 
                     $order->payment_complete();
