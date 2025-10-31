@@ -1511,5 +1511,6 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
             echo '<div style = "margin-left: 30px; padding: 5px;">You\'ll be directed to the next page to complete the payment. Powered by <a href="https://tillpayments.com/">Till Payments</a></div>';
         }
     }
+    }
 }
 
