@@ -11,6 +11,9 @@ if (!class_exists('WC_TillPayments_V1_10_5_GooglePay')) {
     {
     public $id = 'googlepay_v1_10_5';
 
+    // Store the original gateway ID to read settings from the original plugin
+    protected $original_gateway_id = 'till_payments_googlepay';
+
     public $method_title = 'Google Pay';
 
     /**
