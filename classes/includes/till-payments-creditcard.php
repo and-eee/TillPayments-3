@@ -54,8 +54,8 @@ if (!class_exists('WC_TillPayments_CreditCard')) {
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('wp_enqueue_scripts', function () {
-            wp_register_script('payment_js', $this->get_option('apiHost') . 'js/integrated/payment.1.3.min.js', [], TILL_PAYMENTS_EXTENSION_VERSION, false);
-            wp_register_script('till_payments_js_' . $this->id, plugins_url('/tillpayments/assets/js/till-payments.js'), [], TILL_PAYMENTS_EXTENSION_VERSION, false);
+            wp_register_script('payment_js_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, $this->get_option('apiHost') . 'js/integrated/payment.1.3.min.js', [], TILL_PAYMENTS_EXTENSION_VERSION, false);
+            wp_register_script('till_payments_js_' . $this->id . '_' . TILL_PAYMENTS_EXTENSION_VERSION_ID, plugins_url('/tillpayments/assets/js/till-payments.js'), [], TILL_PAYMENTS_EXTENSION_VERSION, false);
         }, 999);
         add_action('woocommerce_api_wc_' . $this->id, [$this, 'process_callback']);
         add_filter('script_loader_tag', function ($tag, $handle) {
