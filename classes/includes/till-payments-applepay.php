@@ -887,6 +887,53 @@ class WC_TillPayments_ApplePay extends WC_Payment_Gateway
                     'preauthorize' => 'Preauthorize only',
                 ],
             ],
+            'receipt_section' => [
+                'title' => __('Payment Receipt Settings', 'woocommerce'),
+                'type' => 'title',
+                'description' => __('Customize payment receipts sent to customers after successful payment.', 'woocommerce'),
+            ],
+            'receipt_enabled' => [
+                'title' => __('Enable Receipt Emails', 'woocommerce'),
+                'type' => 'checkbox',
+                'label' => __('Send payment receipt emails', 'woocommerce'),
+                'default' => 'yes',
+            ],
+            'receipt_logo' => [
+                'title' => __('Receipt Logo', 'woocommerce'),
+                'type' => 'text',
+                'description' => __('Upload logo URL for receipts (PNG/JPG, max 200px height)', 'woocommerce'),
+                'default' => '',
+            ],
+            'receipt_brand_color' => [
+                'title' => __('Brand Color', 'woocommerce'),
+                'type' => 'text',
+                'description' => __('Hex color code for receipt header (e.g., #635bff)', 'woocommerce'),
+                'default' => '#635bff',
+            ],
+            'receipt_business_name' => [
+                'title' => __('Business Name', 'woocommerce'),
+                'type' => 'text',
+                'description' => __('Your business name displayed in receipt footer', 'woocommerce'),
+                'default' => get_bloginfo('name'),
+            ],
+            'receipt_contact_email' => [
+                'title' => __('Contact Email', 'woocommerce'),
+                'type' => 'email',
+                'description' => __('Support email displayed in receipts', 'woocommerce'),
+                'default' => get_option('admin_email'),
+            ],
+            'receipt_footer_text' => [
+                'title' => __('Footer Text', 'woocommerce'),
+                'type' => 'textarea',
+                'description' => __('Custom footer message (max 500 chars)', 'woocommerce'),
+                'default' => 'Thank you for your payment!',
+            ],
+            'receipt_attach_pdf' => [
+                'title' => __('Attach PDF', 'woocommerce'),
+                'type' => 'checkbox',
+                'label' => __('Attach PDF receipt to email', 'woocommerce'),
+                'default' => 'yes',
+            ],
         ];
     }
 
