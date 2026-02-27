@@ -42,9 +42,13 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
+        $this->has_fields = (bool) $this->get_option('integrationKey');
+
         $this->supports = array(
             'products',
-            'refunds'
+            'refunds',
+            'tokenization',
+            'add_payment_method',
         );
 
         $this->title = $this->get_option('title');
@@ -310,14 +314,40 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
          * proceed to pay now page or apply submitted transaction token
          */
         if ($this->get_option('integrationKey')) {
+            $selectedPaymentToken = !empty($this->get_post_data()['wc-' . $this->id . '-payment-token'])
+                ? $this->get_post_data()['wc-' . $this->id . '-payment-token']
+                : 'new';
+
+            if ($selectedPaymentToken && $selectedPaymentToken !== 'new') {
+                $wcPaymentToken = WC_Payment_Tokens::get($selectedPaymentToken);
+
+                if (!$wcPaymentToken ||
+                    (int) $wcPaymentToken->get_user_id() !== (int) get_current_user_id() ||
+                    $wcPaymentToken->get_gateway_id() !== $this->id
+                ) {
+                    wc_add_notice(__('Invalid saved card selected.', 'woocommerce'), 'error');
+                    return $this->paymentFailedResponse();
+                }
+
+                $transaction->setReferenceTransactionId($wcPaymentToken->get_token());
+                $transaction->setTransactionIndicator(\TillPayments\Client\Transaction\Debit::TRANSACTION_INDICATOR_CARDONFILE_MERCHANT);
+            }
+
             $token = !empty($this->get_post_data()['token']) ? $this->get_post_data()['token'] : null;
-            if (!$token) {
+            if ($selectedPaymentToken === 'new' && !$token) {
                 return [
                     'result' => 'success',
                     'redirect' => $this->order->get_checkout_payment_url(false),
                 ];
             }
-            $transaction->setTransactionToken($token);
+
+            if ($selectedPaymentToken === 'new') {
+                $transaction->setTransactionToken($token);
+            }
+
+            if ($this->user && $this->save_payment_method_requested() && $selectedPaymentToken === 'new') {
+                $transaction->setWithRegister(true);
+            }
         }
 
         $this->log('  > created TillPayments transaction object. orderId: '.$orderId.', orderTxId: '. $orderTxId);
@@ -388,6 +418,10 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
 
                 $this->log('  > return type: FINISHED');
                 $this->log('  > result data: '.print_r($result->toArray(), true));
+
+                if ($this->user && $this->save_payment_method_requested()) {
+                    $this->saveCardToken($result);
+                }
             }
 
             if ($transactionRequest === 'preauthorize') {
@@ -647,6 +681,12 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
 
     public function payment_fields()
     {
+        if ($this->supports('tokenization') && is_checkout()) {
+            $this->tokenization_script();
+            $this->saved_payment_methods();
+            $this->save_payment_method_checkbox();
+        }
+
         wp_enqueue_script('payment_js');
         wp_enqueue_script('till_payments_js_' . $this->id);
 
@@ -1501,6 +1541,41 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
     {
         return null;
     }
+
+    private function saveCardToken(TillPayments\Client\Transaction\Result $result)
+    {
+        if (!$result->getRegistrationId()) {
+            return;
+        }
+
+        $existingTokens = WC_Payment_Tokens::get_customer_tokens($this->user->ID, $this->id);
+        foreach ($existingTokens as $existingToken) {
+            if ($existingToken->get_token() === $result->getRegistrationId()) {
+                return;
+            }
+        }
+
+        $token = new WC_Payment_Token_CC();
+        $token->set_token($result->getRegistrationId());
+        $token->set_gateway_id($this->id);
+        $token->set_user_id($this->user->ID);
+
+        $returnData = $result->getReturnData();
+        if ($returnData instanceof TillPayments\Client\Data\Result\CreditcardData) {
+            $token->set_card_type($returnData->getType() ?: 'card');
+            $token->set_last4($returnData->getLastFourDigits() ?: '0000');
+            $token->set_expiry_month($returnData->getExpiryMonth() ?: date('m'));
+            $token->set_expiry_year($returnData->getExpiryYear() ?: date('Y'));
+        } else {
+            $token->set_card_type('card');
+            $token->set_last4('0000');
+            $token->set_expiry_month(date('m'));
+            $token->set_expiry_year(date('Y'));
+        }
+
+        $token->save();
+    }
+
     /** 
      * add payment description
     */
@@ -1511,4 +1586,3 @@ class WC_TillPayments_CreditCard extends WC_Payment_Gateway
         }
     }
 }
-
