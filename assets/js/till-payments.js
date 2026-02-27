@@ -20,6 +20,11 @@
 	        }
 	    };
 	    $paymentFormSubmitButton.on('click', function (e) {
+	        var selectedSavedCard = $('input[name="wc-' + $('input[name="payment_method"]:checked').val() + '-payment-token"]:checked').val();
+	        if (selectedSavedCard && selectedSavedCard !== 'new') {
+	            return true;
+	        }
+
 	        tillPaymentsSeamless.submit(
 	            function (token) {
 	                $paymentFormTokenInput.val(token);
